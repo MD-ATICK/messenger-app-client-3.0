@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.teal {
+  background-color: #002a2a;
+
+
+}
+
+.light-teal {
+  background-color: #00393a;
+}
+
+.lemon {
+  background-color: #2d9b8af1;
+}
+
+.light-lemon {
+  background-color: #10baa0f1;
+}
+
+/* Scrollbar style */
+.scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #000000 #f1f1f1 !important;
+  overflow-y: scroll;
+}
+
+/* Track style */
+.scroll-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1 !important;
+}
+
+/* Thumb style */
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #000000 !important;
+  border-radius: 5px !important;
+}
+
+/* Handle hover style */
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555555 !important;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  scroll-behavior: smooth;
+}
+
+@media (max-width : 500px) {
+  .tikkoren {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
