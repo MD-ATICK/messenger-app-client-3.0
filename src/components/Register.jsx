@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { PulseLoader } from 'react-spinners'
 import { UserContext } from '../../provider/ContextPorvider';
-
+import { toast } from 'react-hot-toast'
 
 function Register() {
 
@@ -27,13 +27,16 @@ function Register() {
             form.append("image", avatar);
             const { data: { data: { url } }, status: ibbStatus } = await axios.post(`https://api.imgbb.com/1/upload?key=6226ca30d95b139a79184223cfbc266a`, form)
             if (ibbStatus === 200) {
-                const { data, status } = await axios.post(`http://localhost:4000/api/messenger/register`, { username, email, password, avatar: url })
+                const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/register`, { username, email, password, avatar: url })
                 if (status === 201) {
                     setuser(data.createUser)
                     localStorage.setItem('v3token', data.v3token)
                     setregisterLoading(false)
                     setreset(!reset)
                     navigate('/')
+                } else if (status === 207) {
+                    toast.error(data.error)
+                    setregisterLoading(false)
                 }
             }
         } catch (error) {

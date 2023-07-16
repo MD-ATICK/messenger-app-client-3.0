@@ -1,5 +1,6 @@
 import axios from "axios";
 import Swal from 'sweetalert2'
+import { Navigate, useNavigate } from 'react-router-dom'
 import React, { createContext, useEffect, useState } from "react";
 
 export const UserContext = createContext(null)
@@ -11,7 +12,7 @@ const ContextProvider = ({ children }) => {
     const [onlineUsers, setonlineUsers] = useState([]);
 
     const [reset, setreset] = useState(false);
-
+    // const navigate = useNavigate()
 
     const [openedChat, setopenedChat] = useState(null);
     const [chats, setchats] = useState(null);
@@ -28,10 +29,11 @@ const ContextProvider = ({ children }) => {
 
     const token = localStorage.getItem('v3token')
 
+    let x = false;
 
     const authUser = async () => {
         try {
-            const { data, status } = await axios.get(`http://localhost:4000/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setuser(data.user)
                 setauthLoading(false)
@@ -67,7 +69,7 @@ const ContextProvider = ({ children }) => {
 
     const Users = async () => {
         try {
-            const { data, status } = await axios.get(`http://localhost:4000/api/messenger/users`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/users`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setusers(data.users)
             }
@@ -79,12 +81,13 @@ const ContextProvider = ({ children }) => {
     const nijerChats = async () => {
         setnijerchatLoading(true)
         try {
-            const { data, status } = await axios.get(`http://localhost:4000/nijer-chats`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/nijer-chats`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
-                console.log(data)
                 setnijerchatLoading(false)
                 setchats(data.nijer_chats)
-
+            } else if (status === 223) {
+                localStorage.removeItem('v3token')
+                window.location.href = '/messenger/register'
             }
         } catch (error) {
             console.log(error)
@@ -94,7 +97,7 @@ const ContextProvider = ({ children }) => {
     const FriendchatBoxFetch = async (user, socket) => {
         try {
             // setchatLoading(true)
-            const { data, status } = await axios.post(`http://localhost:4000/chat`, { user }, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/chat`, { user }, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 201) {
                 // setchatLoading(false)
                 setopenedChat(data.chat)
@@ -113,15 +116,14 @@ const ContextProvider = ({ children }) => {
 
     const messageSent = async (content, chatBoxRef) => {
         try {
-            setmessageSendLoading(true)
             setchatMessages([...chatMessages, { content, sender: { _id: user._id }, createdAt: new Date().toLocaleString() }])
+            setmessageSendLoading(true)
             openedChat.latestMessage = { content, sender: { _id: user._id }, createdAt: new Date().toLocaleString() }
             setopenedChat(openedChat)
             if (chatBoxRef.current) {
-                console.log('index run')
                 chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
             }
-            const { data, status } = await axios.post(`http://localhost:4000/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 201) {
                 setmessageSendLoading(false)
             }
@@ -133,7 +135,7 @@ const ContextProvider = ({ children }) => {
     const chatAllMessages = async () => {
         try {
             setallmsgLoading(true)
-            const { data, status } = await axios.get(`http://localhost:4000/chat-allmessages?chat=${openedChat._id}`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/chat-allmessages?chat=${openedChat._id}`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setallmsgLoading(false)
                 setchatMessages(data.messages)
@@ -188,6 +190,7 @@ const ContextProvider = ({ children }) => {
         seen,
         setseen,
         nijerChats,
+        x
     }
 
     return (

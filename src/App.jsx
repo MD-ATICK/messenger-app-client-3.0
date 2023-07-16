@@ -5,6 +5,7 @@ import Register from './components/Register'
 import ProtectedRoute from './components/ProtectedRoute'
 import Messenger from './Messenger'
 import ContextProvider from '../provider/ContextPorvider'
+import Me from './components/Me'
 
 function App() {
 

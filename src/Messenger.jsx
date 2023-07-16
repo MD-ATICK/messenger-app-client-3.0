@@ -27,7 +27,7 @@ function Messenger() {
 
 
   useEffect(() => {
-    socket = io('http://localhost:4000')
+    socket = io('https://mesender-serverside-3-0.onrender.com')
 
     if (socket && user) {
       socket.emit('addUser', user)
@@ -50,7 +50,6 @@ function Messenger() {
         reciveRef.current.play()
         setchatMessages(prev => [...prev, props])
         if (chatBoxRef.current) {
-          console.log('_')
           chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
       })
@@ -68,9 +67,9 @@ function Messenger() {
         <UserList socket={socket} onlineUsers={onlineUsers} setonlineUsers={setonlineUsers} />
       </div>
       <div className={`${openedChat ? 'block' : "hidden lg:block"} flex-grow teal h-screen`}>
-        <UserChatBox chatBoxRef={chatBoxRef} socket={socket} />
+        <UserChatBox setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} chatBoxRef={chatBoxRef} socket={socket} />
       </div>
-      <div className={` ${userProfileShow ? 'w-[320px]' : 'w-0'} tikkoren  h-screen duration-200 transform light-teal`}>
+      <div className={` ${userProfileShow ? ' w-full lg:w-[320px]' : 'w-0'} tikkoren h-screen overflow-y-scroll duration-500 transform `}>
         <UserProfile setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} />
       </div>
 

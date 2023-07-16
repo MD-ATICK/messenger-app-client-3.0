@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { PulseLoader } from 'react-spinners'
 import { UserContext } from '../../provider/ContextPorvider';
 import axios from 'axios';
+import { toast } from 'react-hot-toast'
 
 
 function Login() {
@@ -12,24 +13,29 @@ function Login() {
     const [password, setpassword] = useState('atick1');
     const [loginLoading, setLoginLoading] = useState(false);
 
-    const { setuser , reset , setreset } = useContext(UserContext)
+    const { setuser, reset, setreset } = useContext(UserContext)
 
 
     const LoginHanlder = async () => {
         try {
             setLoginLoading(true)
-            const { data, status } = await axios.post(`http://localhost:4000/api/messenger/login`, { email, password })
+            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/login`, { email, password })
             if (status === 201) {
                 setuser(data.user)
                 localStorage.setItem('v3token', data.v3token)
                 setLoginLoading(false)
                 setreset(!reset)
                 navigate('/')
+            } else if (status === 207) {
+                toast.error(data.error)
+                setLoginLoading(false)
             }
         } catch (error) {
             console.log(error)
         }
     }
+
+    const [x, setx] = useState(true);
 
 
     return (

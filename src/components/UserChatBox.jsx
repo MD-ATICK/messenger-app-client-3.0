@@ -8,9 +8,9 @@ import { ClipLoader, PulseLoader, ScaleLoader } from 'react-spinners'
 import moment from 'moment'
 import { MdOutlineDoneAll } from 'react-icons/md'
 
-function UserChatBox({ socket, chatBoxRef }) {
+function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }) {
 
-  const { openedChat, setopenedChat, messageSent, messageSendLoading, FriendchatBoxFetch, nijerChats, chatMessages, user, allmsgLoading, seen, chats, setchats } = useContext(UserContext)
+  const { openedChat, setopenedChat, messageSent, messageSendLoading, onlineUsers, nijerChats, chatMessages, user, allmsgLoading, seen, chats, setchats } = useContext(UserContext)
 
   const sendRef = useRef()
 
@@ -18,6 +18,17 @@ function UserChatBox({ socket, chatBoxRef }) {
   const [images, setimages] = useState([]);
   const [imageLoading, setimageLoading] = useState(false);
   const [typeing, setTypeing] = useState('');
+  const [ishow, setishow] = useState(false);
+
+  const randomGenerate = () => {
+    const array = ['a', '#', '@', '&', 'f', 's', 'a', 'e', 'w', 'b', 'n', '1', '5', '8', '3']
+    let generated = 'atick';
+    for (let i = 0; i <= 10; i++) {
+      const regx = Math.floor(Math.random() * 15)
+      generated += array[regx]
+    }
+    return generated;
+  }
 
   const changeHanlder = (e) => {
     const v = e.target.files
@@ -25,14 +36,18 @@ function UserChatBox({ socket, chatBoxRef }) {
       const form = new FormData()
       form.append("image", v[a]);
       axios.post(`https://api.imgbb.com/1/upload?key=6226ca30d95b139a79184223cfbc266a`, form)
-        .then((res) => setimages(prev => [...prev, res.data.data.url]))
+        .then((res) => setimages(prev => [...prev, { _id: randomGenerate(), image: res.data.data.url }]))
     }
+  }
+
+  const closeHanlder = (_id) => {
+    const updatedimages = images.filter((each) => each._id !== _id)
+    setimages(updatedimages)
   }
 
   const handleMessageSent = () => {
     setimages([])
     setmessageText('')
-    console.log(chatBoxRef.current)
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
@@ -54,7 +69,6 @@ function UserChatBox({ socket, chatBoxRef }) {
     if (e.key === 'Enter') {
       setimages([])
       setmessageText('')
-      console.log(chatBoxRef.current)
       if (chatBoxRef.current) {
         chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
       }
@@ -90,10 +104,9 @@ function UserChatBox({ socket, chatBoxRef }) {
 
   }
 
-
   const unseenFetch = async ({ message, chatid }) => {
     const token = localStorage.getItem('v3token')
-    const { data, status } = await axios.post(`http://localhost:4000/chat/unseen/${chatid}`, {
+    const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/chat/unseen/${chatid}`, {
       thisMessage: {
         chat: message.chat._id,
         content: message.content,
@@ -103,7 +116,6 @@ function UserChatBox({ socket, chatBoxRef }) {
     },
       { headers: { Authorization: `Bearer ${token}` } })
     if (status === 201) {
-      console.log(data)
     }
   }
 
@@ -137,7 +149,6 @@ function UserChatBox({ socket, chatBoxRef }) {
             }
             return chat;
           });
-          console.log('unseen', updatedChats)
           setchats(updatedChats);
           unseenFetch({ message, chatid });
         }
@@ -163,7 +174,6 @@ function UserChatBox({ socket, chatBoxRef }) {
       socket.on('test', (props) => {
         if (openedChat) {
           let chat = chats.find((c) => c._id === props.chat._id)
-          // console.log('test', chat)
           // chat.latestMessage = props
           openedChat.latestMessage = { content: props.content, sender: { _id: props.sender }, chat: props.chat, createdAt: props.createdAt };
           setopenedChat(openedChat);
@@ -178,16 +188,8 @@ function UserChatBox({ socket, chatBoxRef }) {
             }
             return chat;
           });
-          console.log('emptykor', updatedChats)
           setchats(updatedChats);
         }
-        // if (chats) {
-        //   console.log('what i do?', chatid)
-        //   let x = chats.find((c) => c._id === chatid.toString())
-        //   x.unseenMessages = []
-        //   // setchats(chats)
-        //   setchats([x])
-        // }
       })
 
       return () => {
@@ -203,14 +205,16 @@ function UserChatBox({ socket, chatBoxRef }) {
     }
   }, [socket, chats, openedChat, setopenedChat]);
 
+  const FindotherUser = openedChat && user && openedChat.users.find((c) => c._id.toString() !== user._id.toString())
 
   useEffect(() => {
     if (!allmsgLoading && chatBoxRef.current) {
-      console.log('_')
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
 
   }, [allmsgLoading]);
+
+  const otherUser = openedChat && user && openedChat.users.find((c) => c._id.toString() !== user._id.toString())
 
   return (
     <>
@@ -220,16 +224,15 @@ function UserChatBox({ socket, chatBoxRef }) {
             <div className=' relative flex flex-col justify-between  h-full'>
 
               {/* <===>   Navbar   <===> */}
-              <div className='flex h-[55px]  bg-[#003435] px-6 justify-between items-center'>
+              <div className='flex h-[75px] py-2  bg-[#003435] px-4 justify-between items-center'>
                 <audio ref={sendRef} src="./wp-message-send.mp3"></audio>
-                <div className='flex items-center gap-x-3'>
-                  <button onClick={BackHanlder} className='p-2 block lg:hidden hover:bg-teal-700 cursor-pointer rounded-lg'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
-                    </svg>
-                  </button>
-                  <img src={openedChat && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='w-9 shadow-sm shadow-white h-9 rounded-full object-cover' alt="" />
-                  <h1 className=' font-sans tracking-[0.05em] capitalize text-white font-[500]'>{openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}</h1>
+                <div className='flex items-center gap-x-1'>
+                  <button onClick={BackHanlder} className='list-gradient py-[8px] px-4 rounded-md text-white  shadow-[#166a64] font-sans tracking-wide mr-4'>back</button>
+                  <div className='h-9 w-9 relative'>
+                    <img loading='lazy' src={openedChat && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='w-full shadow-sm shadow-white h-full rounded-full object-cover' alt="" />
+                    <p className={`h-4 w-4 rounded-full ${onlineUsers && onlineUsers.find((u) => u._id === otherUser._id) ? 'bg-green-500 block' : 'hidden'}  absolute  border-[3.5px] border-[#00393a] -top-1 -right-1 `}></p>
+                  </div>
+                  <h1 className=' font-jo tracking-[0.05em] capitalize text-white font-[500]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}</h1>
                 </div>
                 <div className='flex items-center gap-x-2'>
                   <button className='p-2 teal cursor-pointer rounded-lg'>
@@ -238,66 +241,82 @@ function UserChatBox({ socket, chatBoxRef }) {
                     </svg>
 
                   </button>
-                  <button className='p-2 teal cursor-pointer rounded-lg'>
+                  <button className='p-2 teal cursor-pointer rounded-lg' >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-5 h-5 hover:scale-105 duration-150">
                       <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
                     </svg>
                   </button>
-                  <button className='p-2 teal cursor-pointer rounded-lg'>
-                    <BsThreeDots className='text-white hover:scale-125 duration-100' />
+                  <button onClick={() => setuserProfileShow(!userProfileShow)} className='p-1 teal cursor-pointer rounded-lg'>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                    </svg>
+
                   </button>
                 </div>
               </div>
 
 
               {/* <===> chatBox <===> */}
-              <div ref={chatBoxRef} className='overflow-y-scroll min-h-[620px] h-full pb-16 mb-40 px-8 border-white'>
-                <p className='  text-gray-200 mt-3 mb-6 text-center font-sans tracking-wide'>You aren't friends but you are start messeageing with MD Atick.</p>
+              <div ref={chatBoxRef} className='overflow-y-scroll h-[700px] pb-12 lg:pb-16 mb-20  px-8 border-white'>
+                <p className='  text-[#bebebe] mt-3 mb-6 text-[14px] lg:text-[18px] text-center  tracking-wide'>You aren't friends but you are able to start messeageing with <span className=' capitalize text-white font-[600] font-sans tracking-wide text-[16px]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}.</span></p>
                 {
                   allmsgLoading ?
                     <p className='text-center'><PulseLoader color='teal' /></p> :
                     user && chatMessages && chatMessages.length !== 0 && chatMessages.map((message, index) => {
                       const { content, sender, createdAt } = message
-                      console.log(message)
-                      if (sender._id.toString() === user._id.toString()) {
-                        index === (chatMessages.length - 1) && console.log('hea vai', seen)
-                        // <==> Right Side -- Sender <==>
-                        // <==> Right Side -- Sender <==>
-                        return <div key={index} className='flex items-end mb-2 flex-col justify-end relative'>
-                          {index === (chatMessages.length - 1) && !messageSendLoading &&
 
-                            <div className=' absolute rounded-full border-2 flex justify-center items-center border-[#00a906] p-[2px] bottom-5 -right-[26px] text-[#cacaca]' >
-                              {openedChat && openedChat.unseenMessages.length === 0 ? <img src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='h-4 w-4 rounded-full object-cover' alt="" /> : <MdOutlineDoneAll className='text-[12px]' />}
-                            </div>}
-                          <div className='flex items-center gap-x-3'>
+                      // <==> Right Side -- Sender <==>
+                      // <==> Right Side -- Sender <==>
+                      if (sender._id.toString() === user._id.toString()) {
+
+                        return <div key={index} className='flex items-end mb-3 flex-col justify-end relative'>
+                          {
+                            index === (chatMessages.length - 1) &&
+                            <div className={`absolute rounded-full flex justify-center items-center ${onlineUsers && user && FindotherUser && onlineUsers.find((u) => u._id === FindotherUser._id) ? 'border-[#00a906]' : 'border-[#002a2a]'}  p-[2px] bottom-5 -right-[26px] text-[#cacaca]`} >
+                              {
+                                openedChat && openedChat.unseenMessages.length === 0 ?
+                                  <img loading='lazy' src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className={` h-4 w-4 rounded-full object-cover`} alt="" />
+                                  :
+                                  !messageSendLoading ? <MdOutlineDoneAll className='text-[18px] text-[#00b822]' /> : <MdOutlineDoneAll className='text-[18px] text-[#6d6d6d]' />
+                              }
+                            </div>
+                          }
+                          {
+                            openedChat && chatMessages.length !== openedChat.unseenMessages.length && openedChat.unseenMessages.length > 0 && index === (messageSendLoading ? chatMessages.length - (2 + openedChat.unseenMessages.length) : chatMessages.length - (1 + openedChat.unseenMessages.length)) &&
+                            <div className={`absolute rounded-full flex justify-center ${onlineUsers && user && FindotherUser && onlineUsers.find((u) => u._id === FindotherUser._id) ? 'border-[#00a906]' : 'border-[#002a2a]'} items-center p-[2px] bottom-5 -right-[26px] `} >
+                              <img loading='lazy' src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className={`h-4 w-4 rounded-full object-cover`} alt="" />
+                            </div>
+                          }
+
+                          <div className='flex items-center justify-end flex-wrap gap-x-3'>
                             {
                               content.images.length > 0 && content.images.map((i, index) => {
-                                return <Link to={i} key={index} target='_blank' >
-                                  <img src={i} className='h-[70px] mb-1 w-[60px] lg:w-[70px] lg:h-[150px] object-cover rounded-xl' alt="" />
+                                return <Link to={i.image} key={index} target='_blank' >
+                                  <img src={i.image} className='h-[70px] mb-1 lg:h-[150px] object-cover rounded-xl' alt="" />
                                 </Link>
                               })
                             }
                           </div>
-                          <p className='light-teal font-sans tracking-wide rounded-xl text-[13px] lg:text-[16px] px-3 text-white p-1'>{content.text}</p>
-                          <p className=' text-[#8c8c8c] tracking-wide pr-2 pt-[2px] text-[11px]'>{moment(createdAt).format('LT')}</p>
+                          <p className='teal-gradient font-sans tracking-wide rounded-lg rounded-tr-none text-[14px] lg:text-[16px] py-2 px-3 text-white p-1'>{content.text}</p>
+                          <p className=' text-[#8c8c8c] tracking-wide pr-2 pt-[2px] text-[10px]'>{moment(createdAt).format('LT')}</p>
                         </div>
 
                       } else {
 
                         // <==> Left Side -- Reciver <==>
                         // <==> Left Side -- Reciver <==>
-                        return <div key={index} className='flex items-start mb-2 gap-x-2 justify-start'>
-                          <img className='h-9 w-9 rounded-full object-cover' src={sender.avatar} alt="" />
+                        return <div key={index} className='flex items-start mb-3 gap-x-2 justify-start'>
+                          <img loading='lazy' className='h-9 w-9 rounded-full object-cover' src={sender.avatar} alt="" />
                           <div className='flex items-start flex-col justify-start'>
                             <div className='flex items-center gap-x-3'>
                               {
                                 content.images.length > 0 && content.images.map((i, index) => {
-                                  return <img src={i} key={index} className='h-[70px] mb-1 w-[60px] lg:w-[70px] lg:h-[150px] object-cover rounded-xl' alt="" />
+                                  return <img loading='lazy' src={i.image} key={index} className='h-[70px] mb-1 lg:h-[150px] object-contain shadow-sm shadow-gray-300 bg-transparent rounded-xl' alt="" />
                                 })
                               }
                             </div>
-                            <p className='light-teal font-sans tracking-wide rounded-xl text-[13px] lg:text-[16px] px-3 text-white p-1'>{content.text}</p>
-                            <p className=' text-[#8c8c8c] tracking-wide pl-3 pt-[2px] text-[11px]'>{moment(createdAt).format('LT')}</p>
+                            <p className=' white font-sans shadow-lg tracking-wide font-[600] rounded-lg rounded-tl-none text-[14px] lg:text-[16px] px-3 text-stone-600 py-2'>{content.text}</p>
+                            <p className=' text-[#8c8c8c] tracking-wide pl-3 pt-[2px] text-[10px]'>{moment(createdAt).format('LT')}</p>
                           </div>
                         </div>
 
@@ -307,7 +326,7 @@ function UserChatBox({ socket, chatBoxRef }) {
                 {
                   typeing !== '' &&
                   <div className='flex items-start gap-x-2 mt-4 justify-start'>
-                    <img className='h-9 w-9 rounded-full object-cover' src={typeing.avatar} alt="" />
+                    <img loading='lazy' className='h-9 w-9 rounded-full object-cover' src={typeing.avatar} alt="" />
                     <div className='flex items-start flex-col justify-start'>
                       <p className='light-teal flex items-center gap-x-2 font-sans tracking-wide rounded-xl px-3 text-white p-1'>typeing <PulseLoader color='white' size={8} /></p>
                     </div>
@@ -316,20 +335,31 @@ function UserChatBox({ socket, chatBoxRef }) {
               </div>
 
 
-              <div className='flex absolute gap-x-2 items-center bottom-16 left-52'>
-                {images && images.length > 0 && images.map((img, index) => {
-                  return <div key={index} className='relative overflow-hidden'>
-                    <img src={img} alt="" className='w-16 h-16 overflow-hidden bg-white border border-green-700 rounded-xl shadow-lg object-cover' />
-                    <p className=' absolute -top-[2px] -left-[2px] flex rounded-tl-md justify-center items-center p-[2px] overflow-hidden h-5 w-5 rounded-md cursor-pointer hover:scale-110 transform duration-150 bg-stone-600 text-white'><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    </p>
-                  </div>
-                })}
+              <div className='flex absolute gap-5 items-center bottom-16 flex-wrap left-2 lg:left-52'>
+                {
+                  images && images.length > 0 && images.map((info, index) => {
+                    const { _id, image } = info
+                    return <div key={index} onMouseEnter={() => setishow(true)} onMouseLeave={() => setishow(false)} className='relative  bg-white rounded-lg shadow-gray-300'>
+                      <img loading='lazy' src={image} alt="" className='  h-16 flex-grow  lg:h-20 overflow-hidden bg-transparent   rounded-lg object-cover' />
+
+                      <div className={` ${ishow ? 'h-full' : 'h-0 overflow-hidden'} hidden rounded-lg lg:flex image-selected whitespace-nowrap justify-center transform duration-500 items-center text-[#ebe9e9]  absolute bottom-0 left-0 w-full`}>
+                        <button className=''>
+                          <p className=' font-sans tracking-wide font-[400]' onClick={() => closeHanlder(_id)} >close</p>
+                        </button>
+                      </div>
+                      <div className={`block lg:hidden absolute -top-1 -right-3 teal-gradient py-[2px] px-1 text-[14px] z-50  rounded-md text-white`}>
+                        <button className=' block lg:hidden'>
+                          <p className=' font-sans tracking-wide font-[500]' onClick={() => closeHanlder(_id)}>close</p>
+                        </button>
+                      </div>
+
+                    </div>
+                  })
+                }
               </div>
 
               {/* <==> Search bar <==> */}
-              <div className='text-white h-[55px] px-6 flex items-center justify-center light-teal absolute bottom-0 left-0 w-full '>
+              <div className='text-white  h-[55px] px-2 flex items-center justify-center list-gradient absolute bottom-0 left-0 w-full '>
                 <div className='flex items-center gap-x-[4px]'>
 
 
@@ -358,38 +388,39 @@ function UserChatBox({ socket, chatBoxRef }) {
                 </div>
 
 
-                <div className=' relative h-[40px] ml-2 mr-4 flex-grow flex'>
+                <div className=' relative h-[40px] mx-1 flex-grow flex'>
 
                   {/* <==> search box <==> */}
-                  <input type="text" value={messageText} onChange={textsendHanler} onKeyDown={hanldeMessageText} placeholder='Search user ...' className=' font-sans tracking-wide teal font-[500] h-full px-4 pl-12 text-[15px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
+                  <input type="text" value={messageText} onChange={textsendHanler} onKeyDown={hanldeMessageText} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[15px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
                   <button className=' absolute rounded-full top-1/2 -translate-y-1/2 left-4 '><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                   </button>
 
                   <button className=' absolute rounded-full top-1/2 -translate-y-1/2 right-3 '>
-                    <img className='h-6 w-6 cursor-pointer' src="./happy.png" alt="" />
+                    <img loading='lazy' className='h-6 w-6 cursor-pointer' src="./happy.png" alt="" />
                   </button>
                 </div>
                 <button onClick={handleMessageSent} className={`${messageText !== '' || images.length !== 0 ? 'block' : "hidden"}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 p-[9px] rounded-lg teal h-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 p-[9px] rounded-lg ml-2 bg-[#002222] h-10">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                   </svg>
                 </button>
 
-                <img className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} h-7 w-7 cursor-pointer`} src="./happy.png" alt="" />
+                <img loading='lazy' className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} h-7 w-7 cursor-pointer`} src="./happy.png" alt="" />
               </div>
-            </div>
+            </div >
           ) :
           (
             <div className='h-full w-full flex justify-center items-center'>
               <div className=' w-[450px] flex justify-center gap-y-4 items-center flex-col'>
-                <img className='w-[250px] mb-10' src="./messenger.svg" alt="" />
+                <img loading='lazy' className='w-[250px] mb-10' src="./messenger.svg" alt="" />
                 <p className='text-white text-4xl font-bold'>Messenger App</p>
                 <p className='text-[13px] text-[#878787] tracking-wide leading-6 text-center '>Lorem elit. Asperiores delectus ipsum dolor sit amet consectetur adipisicing elit. Hic eum itaque omnis quo, magni aspernatur illum consequuntur laborum facilis nihil</p>
               </div>
             </div>
-          )}
+          )
+      }
     </>
   )
 }
