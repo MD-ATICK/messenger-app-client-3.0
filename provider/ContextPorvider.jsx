@@ -2,6 +2,7 @@ import axios from "axios";
 import Swal from 'sweetalert2'
 import { Navigate, useNavigate } from 'react-router-dom'
 import React, { createContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export const UserContext = createContext(null)
 
@@ -116,6 +117,7 @@ const ContextProvider = ({ children }) => {
 
     const messageSent = async (content, chatBoxRef) => {
         try {
+
             setchatMessages([...chatMessages, { content, sender: { _id: user._id }, createdAt: new Date().toLocaleString() }])
             setmessageSendLoading(true)
             openedChat.latestMessage = { content, sender: { _id: user._id }, createdAt: new Date().toLocaleString() }
@@ -123,7 +125,8 @@ const ContextProvider = ({ children }) => {
             if (chatBoxRef.current) {
                 chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
             }
-            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token}` } })
+            const token1 = localStorage.getItem('v3token')
+            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token1}` } })
             if (status === 201) {
                 setmessageSendLoading(false)
             }

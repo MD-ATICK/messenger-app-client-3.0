@@ -42,11 +42,11 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
         }
         const token = localStorage.getItem('v3token')
         let chater = chats.find((c) => c._id === chat._id)
-        if (chater.unseenMessages.length > 0 && user && chater.unseenMessages[0].sender !== user._id.toString()) {
+        if (user && chater.unseenMessages.length > 0 && user && chater.unseenMessages[0].sender !== user._id.toString()) {
 
             chater.unseenMessages = []
             setopenedChat(chater)
-            socket.emit('unempty', { chat, userid: user._id })
+            socket.emit('unempty', { chat: chat, userid: user._id })
             const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/unseenRemove', { chatid: chat._id }, { headers: { Authorization: `Bearer ${token}` } })
         } else {
             setopenedChat(chat)

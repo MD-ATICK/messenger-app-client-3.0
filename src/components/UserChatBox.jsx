@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import { ClipLoader, PulseLoader, ScaleLoader } from 'react-spinners'
 import moment from 'moment'
 import { MdOutlineDoneAll } from 'react-icons/md'
+import { toast } from 'react-hot-toast'
 
 function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }) {
 
@@ -46,6 +47,8 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   }
 
   const handleMessageSent = () => {
+    if (messageText === '') return;
+
     setimages([])
     setmessageText('')
     if (chatBoxRef.current) {
@@ -55,14 +58,14 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
       socket.emit('nijerMessageSend', { sender: user._id, chat: openedChat, content: { text: messageText, images }, createdAt: new Date().toLocaleString() })
       socket.emit('stopTypeing', openedChat._id)
     }
+    messageSent({ text: messageText, images }, chatBoxRef)
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
-    messageSent({ text: messageText, images })
     sendRef.current.play()
   }
 
-  const hanldeMessageText = (e) => {
+  const hanldeMessageEnter = (e) => {
 
     if (messageText === '') return;
 
@@ -97,11 +100,10 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   }
 
   const BackHanlder = () => {
-    if (socket) {
-      openedChat && socket.emit('leaveRoom', openedChat._id)
+    if (openedChat && socket) {
+      socket.emit('leaveRoom', openedChat._id)
       setopenedChat(null)
     }
-
   }
 
   const unseenFetch = async ({ message, chatid }) => {
@@ -391,7 +393,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                 <div className=' relative h-[40px] mx-1 flex-grow flex'>
 
                   {/* <==> search box <==> */}
-                  <input type="text" value={messageText} onChange={textsendHanler} onKeyDown={hanldeMessageText} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[15px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
+                  <input type="text" value={messageText} onChange={textsendHanler} onKeyDown={hanldeMessageEnter} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[15px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
                   <button className=' absolute rounded-full top-1/2 -translate-y-1/2 left-4 '><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
