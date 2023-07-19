@@ -4,6 +4,8 @@ import { PiPaintBrushBroad } from 'react-icons/pi'
 import { UserContext } from '../../provider/ContextPorvider'
 import axios from 'axios'
 import { HashLoader, PulseLoader } from 'react-spinners'
+import { toast } from 'react-hot-toast'
+import moment from 'moment'
 
 function Me({ setuserListActivetap }) {
 
@@ -15,6 +17,7 @@ function Me({ setuserListActivetap }) {
   const [direct_avatar_loading, setdirect_avatar_loading] = useState(false);
   const [usernameLoading, setusernameLoading] = useState(false);
 
+  const [accessHanlderLoading, setaccessHanlderLoading] = useState(false);
   const [selectName, setselectName] = useState(false);
 
   const [username, setusername] = useState(user && user.username);
@@ -42,7 +45,6 @@ function Me({ setuserListActivetap }) {
 
     },
   ]
-
 
   const avatarHanlderDirect = async (e) => {
     const file = e.target.files[0]
@@ -96,7 +98,7 @@ function Me({ setuserListActivetap }) {
     setusernameLoading(true)
 
     try {
-      const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/usrenameUpdate`, { username, userid : user && user._id }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/usrenameUpdate`, { username, userid: user && user._id }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         setusernameLoading(false)
         setuser(data.user)
@@ -110,8 +112,42 @@ function Me({ setuserListActivetap }) {
   }
 
 
+  const AccessDeleteHanlder = async (ac) => {
+    const token = localStorage.getItem('v3token')
+    if (!token) return;
+
+    if (user) {
+      try {
+        setaccessHanlderLoading(ac)
+        const { data, status } = await axios.put(`https://mesender-serverside-3-0.onrender.com/api/messenger/accessRemove`, { ac: ac }, { headers: { Authorization: `Bearer ${token}` } })
+        if (status === 201) {
+          console.log(data)
+          user.accessDevices = user.accessDevices && user.accessDevices.filter((accessDevice) => accessDevice !== ac)
+          setuser(user)
+          toast.success(`${validatorDevice(ac)} - access removed successfully`)
+          setaccessHanlderLoading(null)
+        }
+      } catch (error) {
+        setaccessHanlderLoading(null)
+        console.log(error)
+      }
+    }
+  }
+
+  const validatorDevice = (accessDevice) => {
+
+    const upgrateAccessDevice = accessDevice.toLowerCase()
+
+    if (upgrateAccessDevice.includes('pixel')) return 'Pixel Device'
+    else if (upgrateAccessDevice.includes('sm-G981b')) return 'Sumsung Device'
+    else if (upgrateAccessDevice.includes('cpu iphone os 13_2_3 like mac os x')) return 'Iphone Device'
+    else if (upgrateAccessDevice.includes('ipad')) return 'Ipad Book'
+    else if (upgrateAccessDevice.includes('windows')) return 'Laptop Windows'
+    else 'Unknow Device'
+  }
+
   return (
-    user && <div className='p-6 py-3'>
+    user && <div className='p-4 h-screen py-3 overflow-y-scroll'>
       <div className="top-nav flex items-center gap-x-5">
         <button className=' text-white' onClick={() => setuserListActivetap(1)}>
           <BsArrowLeftShort className='text-4xl' />
@@ -155,7 +191,7 @@ function Me({ setuserListActivetap }) {
           }
         </div>
       </div>
-      <div className='mt-6 flex flex-col gap-y-4'>
+      <div className='mt-4 flex flex-col gap-y-2'>
 
         <div className='flex items-center gap-x-5'>
           <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 bg-pink-900 h-8 p-1 rounded-xl">
@@ -188,11 +224,11 @@ function Me({ setuserListActivetap }) {
 
       </div>
 
-      <div className='mt-6'>
+      <div className='mt-4'>
         <p className=' font-sans tracking-wide  text-[#cecece]'>Services</p>
 
         <div>
-          <div className='flex mt-4 justify-between items-center '>
+          <div className='flex mt-3 justify-between items-center '>
             <div className=' flex items-center gap-x-4'>
               <div className='h-10 w-10 flex items-center justify-center bg-teal-600 overflow-hidden rounded-full'>
                 <img loading='lazy' className='h-full w-full scale-150 x' src="https://d2pas86kykpvmq.cloudfront.net/images/humans-3.0/portrait-1.png" alt="" />
@@ -211,7 +247,7 @@ function Me({ setuserListActivetap }) {
         </div>
 
         <div>
-          <div className='flex mt-8 justify-between items-center '>
+          <div className='flex mt-5 justify-between items-center '>
             <div className=' flex items-center gap-x-4'>
               <div className='h-10 w-10 flex items-center justify-center bg-teal-600 overflow-hidden rounded-full'>
                 <PiPaintBrushBroad className='text-2xl' />
@@ -223,7 +259,6 @@ function Me({ setuserListActivetap }) {
           <div className='flex mt-3 items-center gap-3 flex-wrap '>
             <p onClick={() => setselectTheme(1)} className={`h-10 ${selectTheme === 1 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-teal-200  rounded-full`}></p>
             <p onClick={() => setselectTheme(2)} className={`h-10 ${selectTheme === 2 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-green-500  rounded-full`}></p>
-            {/* <p onClick={() => setselectTheme(3)} className={`h-10 ${selectTheme === 3 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-red-600  rounded-full`}></p> */}
             <p onClick={() => setselectTheme(4)} className={`h-10 ${selectTheme === 4 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-purple-600  rounded-full`}></p>
             <p onClick={() => setselectTheme(5)} className={`h-10 ${selectTheme === 5 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-sky-600  rounded-full`}></p>
             <p onClick={() => setselectTheme(6)} className={`h-10 ${selectTheme === 6 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-yellow-600  rounded-full`}></p>
@@ -237,6 +272,39 @@ function Me({ setuserListActivetap }) {
         </div>
 
       </div>
+
+      {/* ==> Accessed Devices <== */}
+      <div className='mt-5'>
+        <p className=' font-sans tracking-wide pb-2  text-[#cecece]'>Accessed Devices <span className='text-[12px] tracking-wide'>(new future added)</span></p>
+        <div className='flex flex-col gap-y-3'>
+          {
+            user && user.accessDevices.length > 0 && user.accessDevices.map((ac, index) => {
+              if (window.navigator.userAgent !== ac.accessDevice) {
+                return <div key={index} className='flex items-center gap-x-3  lg:gap-x-4 '>
+                  <div title={ac.accessDevice} className='text-[14px] font-sans font-[500] tracking-wide pink-gradient p-[6px] w-full rounded-lg px-2 pl-3   lg:px-3 text-[#ffffff]'>
+                    <div className='flex items-center justify-between'>
+                      {validatorDevice(ac.accessDevice)}
+                      <p className='text-[15px] text-[#ffffff]'><span className='text-[14px] tracking-wide font-[600] font-sans '>Last : </span>{moment(ac.createAt).format('LT')}</p>
+                    </div>
+                    <p className='text-[11px] text-gray-200 mt-[2px] tracking-wide'> ({ac.accessDevice.slice(0, 35)} ...+) </p>
+                  </div>
+                  <button onClick={() => AccessDeleteHanlder(ac.accessDevice)} className='pink-gradient p-[13px] rounded-lg' title={`delete - ${validatorDevice(ac.accessDevice)}`}>
+                    {
+                      accessHanlderLoading && accessHanlderLoading === ac.accessDevice ?
+                        <HashLoader color='#d0d0d0' size={25} />
+                        :
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                    }
+                  </button>
+                </div>
+              }
+            })
+          }
+        </div>
+      </div>
+
     </div >
   )
 }

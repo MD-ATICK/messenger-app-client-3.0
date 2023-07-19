@@ -19,7 +19,12 @@ function ProtectedRoute({ children }) {
         return <Loader />
     } else {
         if (v3token && user && !authLoading) {
-            return children
+            const x = window.navigator.userAgent
+            if (user.accessDevices.find((ac) => ac.accessDevice.toLowerCase() === x.toLowerCase())) {
+                return children
+            } else {
+                return <Navigate to='/messenger/login' state={{ form: location }} replace={true}></Navigate>
+            }
         } else {
             // => Aikane Component Use korte hobe tay navigate() function ar jonne ata use na kore <Navigate /> use korci <==
             return <Navigate to='/messenger/login' state={{ form: location }} replace={true}></Navigate>

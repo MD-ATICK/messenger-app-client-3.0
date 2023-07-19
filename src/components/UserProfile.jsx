@@ -15,7 +15,7 @@ function UserProfile(props) {
 
   return (
     openedChat &&
-    <div className=' w-full flex justify-end light-teal'>
+    <div className=' w-full flex z-[9999] justify-end light-teal'>
       <div className=' relative  h-screen overflow-y-scroll'>
         <button className=' text-white p-6 pb-2' onClick={() => setuserProfileShow(false)}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-7 h-7">
@@ -23,13 +23,7 @@ function UserProfile(props) {
           </svg>
 
         </button>
-
-        {/* <button onClick={() => setuserProfileShow(!userProfileShow)} className={`p-2 teal w-[40px] outline-none shadow-sm shadow-white fixed  h-[40px] justify-center items-center rounded-lg`}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
-      </button> */}
-
+        
         <div className='w-full px-8 pb-0 flex gap-x-5 justify-start'>
           <div className=' relative'>
             <img src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='w-[100px] shadow-white h-[100px] rounded-full object-cover' alt="" />
@@ -37,7 +31,7 @@ function UserProfile(props) {
           </div>
           <div>
             <h1 className=' font-sans  capitalize tracking-wider text-white text-[16px] font-[500]'>{openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}</h1>
-            {onlineUsers.length > 0 && <h1 className={` ${onlineUsers.find((i) => i._id === otherUser._id) ? 'text-green-500 font-[500]' : ' text-red-600 font-[600]'} font-sans capitalize tracking-wider  text-[14px] `}>{onlineUsers.find((i) => i._id === openedChat.users[1]._id) ? 'Active' : 'In active'}</h1>}
+            {onlineUsers.length > 0 && <h1 className={` ${onlineUsers.find((i) => i._id === otherUser._id) ? 'text-green-500 font-[500]' : ' text-red-600 font-[600]'} font-sans capitalize tracking-wider  text-[14px] `}>{onlineUsers.find((i) => i._id === otherUser._id) ? 'Active' : 'In active'}</h1>}
           </div>
         </div>
 

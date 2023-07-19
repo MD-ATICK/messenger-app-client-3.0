@@ -6,17 +6,19 @@ import { PulseLoader } from 'react-spinners'
 import moment from 'moment'
 import { MdOutlineDoneAll, MdToken } from 'react-icons/md'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Me from './Me'
 
 
 function UserList({ onlineUsers, setonlineUsers, socket }) {
 
-    const { LogoutUser, users, user, reset, setreset, nijerchatLoading, FriendchatBoxFetch, messageSendLoading, chats, setopenedChat, openedChat, search, setsearch, chatLoading, setchatLoading, seen } = useContext(UserContext)
+    const { LogoutUser, users, setindexSet, user, reset, setreset, nijerchatLoading, FriendchatBoxFetch, messageSendLoading, chats, setopenedChat, openedChat, search, setsearch, chatLoading, setchatLoading, seen } = useContext(UserContext)
 
     const [usersnew, setusersnew] = useState(users ? users : null);
     const [userListActivetap, setuserListActivetap] = useState(1);
     const unreadArray = ''
+
+    const navigate = useNavigate()
 
 
     const UserFilterHanlder = (e) => {
@@ -43,7 +45,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
         const token = localStorage.getItem('v3token')
         let chater = chats.find((c) => c._id === chat._id)
         if (user && chater.unseenMessages.length > 0 && user && chater.unseenMessages[0].sender !== user._id.toString()) {
-
+            setindexSet(null)
             chater.unseenMessages = []
             setopenedChat(chater)
             socket.emit('unempty', { chat: chat, userid: user._id })
@@ -168,7 +170,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                                         <div className={` ${chat.latestMessage ? ' uppercase text-[14px]' : 'lowercase text-white text-[12px]'} ${userUnseened ? ' text-white' : 'text-[#b5b5b5]'}  tracking-wide pl-2 `}>
                                             {chat.latestMessage
                                                 ? moment(chat.latestMessage.createdAt).format('LT')
-                                                : moment(chat.createdAt).startOf('hour').fromNow()
+                                                : moment(chat.createdAt).startOf('min').fromNow()
                                             }
                                         </div>
                                         {/* <div>

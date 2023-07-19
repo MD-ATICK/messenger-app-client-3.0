@@ -4,6 +4,7 @@ import UserChatBox from './components/UserChatBox'
 import UserProfile from './components/UserProfile'
 import io from 'socket.io-client'
 import { UserContext } from '../provider/ContextPorvider'
+import axios from 'axios'
 
 let socket;
 

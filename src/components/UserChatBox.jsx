@@ -20,6 +20,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   const [imageLoading, setimageLoading] = useState(false);
   const [typeing, setTypeing] = useState('');
   const [ishow, setishow] = useState(false);
+  const [iconShow, seticonShow] = useState(false);
 
   const randomGenerate = () => {
     const array = ['a', '#', '@', '&', 'f', 's', 'a', 'e', 'w', 'b', 'n', '1', '5', '8', '3']
@@ -216,6 +217,8 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
   }, [allmsgLoading]);
 
+  let x = null;
+
   const otherUser = openedChat && user && openedChat.users.find((c) => c._id.toString() !== user._id.toString())
 
   return (
@@ -226,7 +229,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
             <div className=' relative flex flex-col justify-between  h-full'>
 
               {/* <===>   Navbar   <===> */}
-              <div className='flex h-[75px] py-2  bg-[#003435] px-4 justify-between items-center'>
+              <div className={`  ${!userProfileShow && 'z-[999]'} flex h-[75px] fixed lg:relative top-0 left-0 w-full  overflow-hidden py-2  bg-[#003435] px-4 justify-between items-center`}>
                 <audio ref={sendRef} src="./wp-message-send.mp3"></audio>
                 <div className='flex items-center gap-x-1'>
                   <button onClick={BackHanlder} className='list-gradient py-[8px] px-4 rounded-md text-white  shadow-[#166a64] font-sans tracking-wide mr-4'>back</button>
@@ -259,32 +262,38 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
 
               {/* <===> chatBox <===> */}
-              <div ref={chatBoxRef} className='overflow-y-scroll h-[700px] pb-12 lg:pb-16 mb-20  px-8 border-white'>
+              <div ref={chatBoxRef} className='overflow-y-scroll h-[750px] pb-16 lg:pb-16 mb-20  px-8 border-white'>
                 <p className='  text-[#bebebe] mt-3 mb-6 text-[14px] lg:text-[18px] text-center  tracking-wide'>You aren't friends but you are able to start messeageing with <span className=' capitalize text-white font-[600] font-sans tracking-wide text-[16px]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}.</span></p>
                 {
                   allmsgLoading ?
                     <p className='text-center'><PulseLoader color='teal' /></p> :
                     user && chatMessages && chatMessages.length !== 0 && chatMessages.map((message, index) => {
                       const { content, sender, createdAt } = message
-
                       // <==> Right Side -- Sender <==>
                       // <==> Right Side -- Sender <==>
                       if (sender._id.toString() === user._id.toString()) {
+                        let oldSeen = openedChat && chatMessages.length !== openedChat.unseenMessages.length && openedChat.unseenMessages.length > 0 && index === (messageSendLoading ? chatMessages.length - (2 + openedChat.unseenMessages.length) : chatMessages.length - (1 + openedChat.unseenMessages.length))
+                        if (oldSeen) {
+                          x = index
+                        }
+                        if (messageSendLoading === true) {
+                          oldSeen = index === x ? true : false
+                        }
+                        oldSeen && console.log('index', index)
 
                         return <div key={index} className='flex items-end mb-3 flex-col justify-end relative'>
                           {
                             index === (chatMessages.length - 1) &&
                             <div className={`absolute rounded-full flex justify-center items-center ${onlineUsers && user && FindotherUser && onlineUsers.find((u) => u._id === FindotherUser._id) ? 'border-[#00a906]' : 'border-[#002a2a]'}  p-[2px] bottom-5 -right-[26px] text-[#cacaca]`} >
                               {
-                                openedChat && openedChat.unseenMessages.length === 0 ?
+                                openedChat && !messageSendLoading && openedChat.unseenMessages.length === 0 ?
                                   <img loading='lazy' src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className={` h-4 w-4 rounded-full object-cover`} alt="" />
                                   :
                                   !messageSendLoading ? <MdOutlineDoneAll className='text-[18px] text-[#00b822]' /> : <MdOutlineDoneAll className='text-[18px] text-[#6d6d6d]' />
                               }
                             </div>
                           }
-                          {
-                            openedChat && chatMessages.length !== openedChat.unseenMessages.length && openedChat.unseenMessages.length > 0 && index === (messageSendLoading ? chatMessages.length - (2 + openedChat.unseenMessages.length) : chatMessages.length - (1 + openedChat.unseenMessages.length)) &&
+                          {openedChat.unseenMessages.length !== 0 && oldSeen &&
                             <div className={`absolute rounded-full flex justify-center ${onlineUsers && user && FindotherUser && onlineUsers.find((u) => u._id === FindotherUser._id) ? 'border-[#00a906]' : 'border-[#002a2a]'} items-center p-[2px] bottom-5 -right-[26px] `} >
                               <img loading='lazy' src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className={`h-4 w-4 rounded-full object-cover`} alt="" />
                             </div>
@@ -299,7 +308,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                               })
                             }
                           </div>
-                          <p className='teal-gradient font-sans tracking-wide rounded-lg rounded-tr-none text-[14px] lg:text-[16px] py-2 px-3 text-white p-1'>{content.text}</p>
+                          <p className={`teal-gradient font-sans tracking-wide rounded-lg rounded-tr-none text-[14px] py-2 px-3 text-white p-1 ${content.text == '👍' ? 'text-[30px] lg:text-[35px] leading-10 duration-200' : 'text-[14px] lg:text-[16px]'} `}>{content.text}</p>
                           <p className=' text-[#8c8c8c] tracking-wide pr-2 pt-[2px] text-[10px]'>{moment(createdAt).format('LT')}</p>
                         </div>
 
@@ -361,7 +370,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
               </div>
 
               {/* <==> Search bar <==> */}
-              <div className='text-white  h-[55px] px-2 flex items-center justify-center list-gradient absolute bottom-0 left-0 w-full '>
+              <div className='text-white fixed lg:relative  h-[70px] lg:h-[80px]  px-2 flex items-center justify-center list-gradient bottom-0 left-0 w-full '>
                 <div className='flex items-center gap-x-[4px]'>
 
 
@@ -389,27 +398,45 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
                 </div>
 
+                <div className={`bg-teal-700 ${iconShow ? 'p-3 h-[150px]' : 'h-0 p-0'} overflow-hidden transform duration-[500ms] whitespace-nowrap grid grid-cols-5 absolute bottom-[80px]  rounded-xl`}>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😻</p>
+                  <p onClick={(e) => setmessageText(messageText + '😎')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😎</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😊</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🥲</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😍</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😪</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😭</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😻</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🪶</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😂</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🤒</p>
+                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😉</p>
+                  <p className='h-5 w-5 rounded-md absolute -bottom-2 right-4 transform rotate-45 bg-teal-700'></p>
+                </div>
 
-                <div className=' relative h-[40px] mx-1 flex-grow flex'>
+                {/* <==> search box <==> */}
+                <div className=' relative h-[50px] mx-1 lg:mx-2  flex-grow flex'>
 
-                  {/* <==> search box <==> */}
-                  <input type="text" value={messageText} onChange={textsendHanler} onKeyDown={hanldeMessageEnter} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[15px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
+                  <input type="text" value={messageText} onFocus={() => seticonShow(false)} onChange={textsendHanler} onKeyDown={hanldeMessageEnter} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[18px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
                   <button className=' absolute rounded-full top-1/2 -translate-y-1/2 left-4 '><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                   </button>
 
-                  <button className=' absolute rounded-full top-1/2 -translate-y-1/2 right-3 '>
-                    <img loading='lazy' className='h-6 w-6 cursor-pointer' src="./happy.png" alt="" />
-                  </button>
+                  <button onClick={() => seticonShow(!iconShow)} className=' absolute rounded-full top-1/2 -translate-y-1/2 right-2 text-[28px] cursor-pointer '>😊 </button>
                 </div>
+
                 <button onClick={handleMessageSent} className={`${messageText !== '' || images.length !== 0 ? 'block' : "hidden"}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 p-[9px] rounded-lg ml-2 bg-[#002222] h-10">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                   </svg>
                 </button>
 
-                <img loading='lazy' className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} h-7 w-7 cursor-pointer`} src="./happy.png" alt="" />
+                <p onClick={() => {
+                  messageSent({ text: '👍', images: [] }, chatBoxRef)
+                  sendRef.current.play()
+                }}
+                  className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} text-[33px] cursor-pointer`} >👍</p>
               </div>
             </div >
           ) :

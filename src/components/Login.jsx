@@ -9,8 +9,8 @@ import { toast } from 'react-hot-toast'
 function Login() {
 
     const navigate = useNavigate()
-    const [email, setemail] = useState('atick1@gmail.com');
-    const [password, setpassword] = useState('atick1');
+    const [email, setemail] = useState('atick@gmail.com');
+    const [password, setpassword] = useState('atick');
     const [loginLoading, setLoginLoading] = useState(false);
 
     const { setuser, reset, setreset } = useContext(UserContext)
@@ -19,7 +19,8 @@ function Login() {
     const LoginHanlder = async () => {
         try {
             setLoginLoading(true)
-            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/login`, { email, password })
+            const currectDevice = window.navigator.userAgent
+            const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/login`, { email, password, currectDevice })
             if (status === 201) {
                 setuser(data.user)
                 localStorage.setItem('v3token', data.v3token)

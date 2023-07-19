@@ -9,9 +9,9 @@ function Register() {
 
     const navigate = useNavigate()
 
-    const [username, setusername] = useState('atick1');
-    const [email, setemail] = useState('atick1@gmail.com');
-    const [password, setpassword] = useState('atick1');
+    const [username, setusername] = useState('atick');
+    const [email, setemail] = useState('atick@gmail.com');
+    const [password, setpassword] = useState('atick');
     const [avatar, setavatar] = useState('https://i.ibb.co/g6p9NsG/profilepic.jpg');
 
 
@@ -24,10 +24,11 @@ function Register() {
         try {
             setregisterLoading(true)
             const form = new FormData();
+            const currectDevice = window.navigator.userAgent
             form.append("image", avatar);
             const { data: { data: { url } }, status: ibbStatus } = await axios.post(`https://api.imgbb.com/1/upload?key=6226ca30d95b139a79184223cfbc266a`, form)
             if (ibbStatus === 200) {
-                const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/register`, { username, email, password, avatar: url })
+                const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/register`, { username, email, password, avatar: url, currectDevice })
                 if (status === 201) {
                     setuser(data.createUser)
                     localStorage.setItem('v3token', data.v3token)

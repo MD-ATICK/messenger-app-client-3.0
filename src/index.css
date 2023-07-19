@@ -86,3 +86,12 @@
 .font-jo{
   font-family: 'Ubuntu', sans-serif;
 }
+.cliplow{
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+
+}
+
+.pink-gradient{
+  background: linear-gradient(274deg, rgba(223,0,140,0.8076923076923077) 0%, rgba(110,0,182,1) 61%, rgba(5,115,255,0.5728744939271255) 100%);
+
+}

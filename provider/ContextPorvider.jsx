@@ -25,6 +25,7 @@ const ContextProvider = ({ children }) => {
     const [messageSendLoading, setmessageSendLoading] = useState(false);
     const [allmsgLoading, setallmsgLoading] = useState(false);
     const [seen, setseen] = useState(false);
+    const [indexSet, setindexSet] = useState(null);
 
     const [nijerchatLoading, setnijerchatLoading] = useState(false);
 
@@ -60,6 +61,7 @@ const ContextProvider = ({ children }) => {
                 if (socket) {
                     openedChat && socket.emit('leaveRoom', openedChat._id)
                     socket.emit('removeAction', user._id)
+                    socket.disconnect();
                 }
                 setuser(null)
                 setopenedChat(null)
@@ -88,7 +90,7 @@ const ContextProvider = ({ children }) => {
                 setchats(data.nijer_chats)
             } else if (status === 223) {
                 localStorage.removeItem('v3token')
-                window.location.href = '/messenger/register'
+                window.location.href = '/messenger/login'
             }
         } catch (error) {
             console.log(error)
@@ -193,7 +195,9 @@ const ContextProvider = ({ children }) => {
         seen,
         setseen,
         nijerChats,
-        x
+        x,
+        indexSet,
+        setindexSet
     }
 
     return (
