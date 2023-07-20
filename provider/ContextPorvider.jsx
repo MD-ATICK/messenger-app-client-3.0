@@ -9,11 +9,12 @@ export const UserContext = createContext(null)
 
 const ContextProvider = ({ children }) => {
 
-    const [users, setusers] = useState(null);
+
     const [onlineUsers, setonlineUsers] = useState([]);
+    const [offlineUsers, setofflineUsers] = useState(1);
 
     const [reset, setreset] = useState(false);
-    // const navigate = useNavigate()
+    const [users, setusers] = useState(null);
 
     const [openedChat, setopenedChat] = useState(null);
     const [chats, setchats] = useState(null);
@@ -26,6 +27,7 @@ const ContextProvider = ({ children }) => {
     const [allmsgLoading, setallmsgLoading] = useState(false);
     const [seen, setseen] = useState(false);
     const [indexSet, setindexSet] = useState(null);
+    const [authReset, setauthReset] = useState(false);
 
     const [nijerchatLoading, setnijerchatLoading] = useState(false);
 
@@ -37,6 +39,7 @@ const ContextProvider = ({ children }) => {
         try {
             const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
+                console.log('Enjoy with client')
                 setuser(data.user)
                 setauthLoading(false)
             }
@@ -87,6 +90,7 @@ const ContextProvider = ({ children }) => {
             const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/nijer-chats`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setnijerchatLoading(false)
+                console.log('Be happy')
                 setchats(data.nijer_chats)
             } else if (status === 223) {
                 localStorage.removeItem('v3token')
@@ -150,17 +154,22 @@ const ContextProvider = ({ children }) => {
         }
     }
 
+    useEffect(() => {
+        const v3token = localStorage.getItem('v3token')
+        v3token ? authUser() : setauthLoading(false);
+    }, [reset, authReset]);
+
+    useEffect(() => {
+        const v3token = localStorage.getItem('v3token')
+        v3token ? Users() : setusers([])
+        v3token ? nijerChats() : setchats([])
+    }, [reset]);
 
     useEffect(() => {
         token && openedChat ? chatAllMessages() : setchatMessages([])
     }, [openedChat]);
 
-    useEffect(() => {
-        const v3token = localStorage.getItem('v3token')
-        v3token ? authUser() : setauthLoading(false);
-        v3token ? Users() : setusers([])
-        v3token ? nijerChats() : setchats([])
-    }, [reset]);
+
 
 
     const content = {
@@ -197,7 +206,11 @@ const ContextProvider = ({ children }) => {
         nijerChats,
         x,
         indexSet,
-        setindexSet
+        setindexSet,
+        authReset,
+        setauthReset,
+        offlineUsers,
+        setofflineUsers
     }
 
     return (

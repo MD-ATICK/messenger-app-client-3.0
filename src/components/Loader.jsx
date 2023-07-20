@@ -1,10 +1,10 @@
 import React from 'react'
-import { PulseLoader } from 'react-spinners'
+import { HashLoader, PulseLoader } from 'react-spinners'
 
 function Loader() {
     return (
-        <div className=' h-screen w-full flex justify-center items-center bg-white z-[9999]'>
-            <PulseLoader color='#003031' />
+        <div className='h-screen w-full flex justify-center items-center z-[9999]'>
+            <HashLoader color='#003031' size={90} speedMultiplier={.8} />
         </div>
     )
 }

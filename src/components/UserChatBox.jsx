@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast'
 
 function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }) {
 
-  const { openedChat, setopenedChat, messageSent, messageSendLoading, onlineUsers, nijerChats, chatMessages, user, allmsgLoading, seen, chats, setchats } = useContext(UserContext)
+  const { offlineUsers, setofflineUsers, openedChat, setopenedChat, messageSent, messageSendLoading, onlineUsers, nijerChats, chatMessages, user, allmsgLoading, seen, chats, setchats } = useContext(UserContext)
 
   const sendRef = useRef()
 
@@ -67,7 +67,6 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   }
 
   const hanldeMessageEnter = (e) => {
-
     if (messageText === '') return;
 
     if (e.key === 'Enter') {
@@ -131,6 +130,19 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
         setTypeing(sender);
       });
 
+      socket.on('offlineUser_15m', (pUser) => {
+        // const upgrateOfflineUsers = offlineUsers.filter((oUser) => oUser._id !== pUser._id)
+        const Localstg_offline_users = localStorage.getItem('20m_ago_u')
+        if (Localstg_offline_users) {
+          const m = localStorage.getItem('20m_ago_u')
+          const parseM = JSON.parse(m)
+          localStorage.setItem('20m_ago_u', JSON.stringify([...parseM, { ...pUser, offlinedtime: Date.now() }]))
+          return setofflineUsers(prev => prev + 1)
+        }
+        localStorage.setItem('20m_ago_u', JSON.stringify([{ ...pUser, offlinedtime: Date.now() }]))
+        setofflineUsers(prev => prev + 1)
+      })
+
       socket.on('newFriend', () => {
         nijerChats()
       })
@@ -155,15 +167,6 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
           setchats(updatedChats);
           unseenFetch({ message, chatid });
         }
-        // if (chats) {
-        //   let x = chats.find((chat) => chat._id.toString() === chatid.toString())
-        //   if (x) {
-        //     x.unseenMessages.push(message)
-        //     x.latestMessage = message
-        //     // setchats(chats)
-        //     setchats([x])
-        //   }
-        // }
       })
 
       socket.on('sender', (message) => {
@@ -204,9 +207,11 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
         socket.off('emptykor')
         socket.off('unseenOfflilne')
         socket.off('newFriend')
+        socket.off('offlineUser_15m')
       };
     }
   }, [socket, chats, openedChat, setopenedChat]);
+
 
   const FindotherUser = openedChat && user && openedChat.users.find((c) => c._id.toString() !== user._id.toString())
 
@@ -229,25 +234,27 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
             <div className=' relative flex flex-col justify-between  h-full'>
 
               {/* <===>   Navbar   <===> */}
-              <div className={`  ${!userProfileShow && 'z-[999]'} flex h-[75px] fixed lg:relative top-0 left-0 w-full  overflow-hidden py-2  bg-[#003435] px-4 justify-between items-center`}>
+              <div className={`  ${!userProfileShow && 'z-[999]'} flex h-[75px] fixed lg:relative top-0 left-0 w-full  overflow-hidden py-2  bg-[#003435] px-2 sm:px-4 justify-between items-center`}>
                 <audio ref={sendRef} src="./wp-message-send.mp3"></audio>
                 <div className='flex items-center gap-x-1'>
-                  <button onClick={BackHanlder} className='list-gradient py-[8px] px-4 rounded-md text-white  shadow-[#166a64] font-sans tracking-wide mr-4'>back</button>
-                  <div className='h-9 w-9 relative'>
-                    <img loading='lazy' src={openedChat && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='w-full shadow-sm shadow-white h-full rounded-full object-cover' alt="" />
-                    <p className={`h-4 w-4 rounded-full ${onlineUsers && onlineUsers.find((u) => u._id === otherUser._id) ? 'bg-green-500 block' : 'hidden'}  absolute  border-[3.5px] border-[#00393a] -top-1 -right-1 `}></p>
+                  <button onClick={BackHanlder} className='list-gradient py-[8px] px-2 sm:px-4 rounded-md text-white  shadow-[#166a64] font-sans tracking-wide mr-1 sm:mr-4'>back</button>
+                  <div onClick={() => setuserProfileShow(true)} className='flex items-center gap-x-2 cursor-pointer' >
+                    <div className='sm:h-9 sm:w-9 h-8 w-8 relative'>
+                      <img loading='lazy' src={openedChat && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='w-full shadow-sm shadow-white h-full rounded-full object-cover' alt="" />
+                      <p className={`h-4 w-4 rounded-full ${onlineUsers && onlineUsers.find((u) => u._id === otherUser._id) ? 'bg-green-500 block' : 'hidden'}  absolute  border-[3.5px] border-[#00393a] -top-1 -right-1 `}></p>
+                    </div>
+                    <h1 className=' font-jo tracking-[0.05em] text-[15px] sm:text-[16px] capitalize text-white font-[500]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username.split(' ')[0]}</h1>
                   </div>
-                  <h1 className=' font-jo tracking-[0.05em] capitalize text-white font-[500]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}</h1>
                 </div>
-                <div className='flex items-center gap-x-2'>
+                <div className='flex items-center gap-x-1 sm:gap-x-2'>
                   <button className='p-2 teal cursor-pointer rounded-lg'>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-5 h-5 hover:scale-105 duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-4 h-4 sm:w-5 sm:w-5 hover:scale-105 duration-150">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                     </svg>
 
                   </button>
                   <button className='p-2 teal cursor-pointer rounded-lg' >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-5 h-5 hover:scale-105 duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={1.5} stroke="" className="w-4 h-4 sm:w-5 sm:w-5 hover:scale-105 duration-150">
                       <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
                     </svg>
                   </button>
@@ -262,8 +269,8 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
 
               {/* <===> chatBox <===> */}
-              <div ref={chatBoxRef} className='overflow-y-scroll h-[750px] pb-16 lg:pb-16 mb-20  px-8 border-white'>
-                <p className='  text-[#bebebe] mt-3 mb-6 text-[14px] lg:text-[18px] text-center  tracking-wide'>You aren't friends but you are able to start messeageing with <span className=' capitalize text-white font-[600] font-sans tracking-wide text-[16px]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}.</span></p>
+              <div ref={chatBoxRef} className='overflow-y-scroll h-[750px] md:m-0 pb-12 sm:pb-16 lg:pb-16 mb-20 pr-[26px] pl-2 mt-20 sm:pr-8 sm:pl-2 border-white'>
+                <p className='  text-[#bebebe] mt-3 mb-6 text-[10px] sm:text-[14px] lg:text-[18px] text-center  tracking-wide'>You aren't friends but you are able to start messeageing with <span className=' capitalize text-white font-[600] font-sans tracking-wide text-[12px] sm:text-[15px]'>{user && openedChat.users.find((c) => c._id.toString() !== user._id.toString()).username}.</span></p>
                 {
                   allmsgLoading ?
                     <p className='text-center'><PulseLoader color='teal' /></p> :
@@ -279,7 +286,6 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                         if (messageSendLoading === true) {
                           oldSeen = index === x ? true : false
                         }
-                        oldSeen && console.log('index', index)
 
                         return <div key={index} className='flex items-end mb-3 flex-col justify-end relative'>
                           {
@@ -298,35 +304,41 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                               <img loading='lazy' src={openedChat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className={`h-4 w-4 rounded-full object-cover`} alt="" />
                             </div>
                           }
-
-                          <div className='flex items-center justify-end flex-wrap gap-x-3'>
-                            {
-                              content.images.length > 0 && content.images.map((i, index) => {
-                                return <Link to={i.image} key={index} target='_blank' >
-                                  <img src={i.image} className='h-[70px] mb-1 lg:h-[150px] object-cover rounded-xl' alt="" />
-                                </Link>
-                              })
-                            }
-                          </div>
-                          <p className={`teal-gradient font-sans tracking-wide rounded-lg rounded-tr-none text-[14px] py-2 px-3 text-white p-1 ${content.text == '👍' ? 'text-[30px] lg:text-[35px] leading-10 duration-200' : 'text-[14px] lg:text-[16px]'} `}>{content.text}</p>
-                          <p className=' text-[#8c8c8c] tracking-wide pr-2 pt-[2px] text-[10px]'>{moment(createdAt).format('LT')}</p>
-                        </div>
-
-                      } else {
-
-                        // <==> Left Side -- Reciver <==>
-                        // <==> Left Side -- Reciver <==>
-                        return <div key={index} className='flex items-start mb-3 gap-x-2 justify-start'>
-                          <img loading='lazy' className='h-9 w-9 rounded-full object-cover' src={sender.avatar} alt="" />
-                          <div className='flex items-start flex-col justify-start'>
-                            <div className='flex items-center gap-x-3'>
+                          <div className={`flex ${content.images.length > 0 && 'p-[1px] sm:p-1 md:p-2 mb-1 sm:mb-2'} bg-[#15f5d032] relative flex-col max-w-[200px] sm:max-w-[310px] lg:max-w-[800px] items-end rounded-xl`}>
+                            <div className={` ${content.images.length > 0 ? 'block' : 'hidden'} sm:h-[14px] sm:w-[14px] w-[10px] h-[10px] rounded-[4px] bg-[#15f5d032] cliplow transform rotate-45 absolute -bottom-[5.5px] sm:-bottom-[6.8px] right-4`}></div>
+                            <div className='flex flex-wrap items-end justify-end'>
                               {
                                 content.images.length > 0 && content.images.map((i, index) => {
-                                  return <img loading='lazy' src={i.image} key={index} className='h-[70px] mb-1 lg:h-[150px] object-contain shadow-sm shadow-gray-300 bg-transparent rounded-xl' alt="" />
+                                  return <Link to={i.image} key={index} target='_blank' >
+                                    <img src={i.image} className='h-[90px]  sm:h-[150px] w-[95px] sm:w-[150px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
+                                  </Link>
                                 })
                               }
                             </div>
-                            <p className=' white font-sans shadow-lg tracking-wide font-[600] rounded-lg rounded-tl-none text-[14px] lg:text-[16px] px-3 text-stone-600 py-2'>{content.text}</p>
+                          </div>
+                          <p className={`teal-gradient ${content.images.length > 0 && 'm-2'} font-sans tracking-wide rounded-lg rounded-tr-none text-sm sm:text-[14px] py-2 px-3 text-white p-1 ${content.text == '👍' ? 'text-[32px] sm:text-[30px] lg:text-[35px] leading-10 duration-200' : 'text-[14px] lg:text-[16px]'} `}>{content.text}</p>
+                          <p className=' text-[#8c8c8c] tracking-wide pr-2 text-[10px]'>{moment(createdAt).format('LT')}</p>
+                        </div>
+
+                      } else {
+                        // <==> Left Side -- Reciver <==>
+                        // <==> Left Side -- Reciver <==>
+                        return <div key={index} className='flex items-start mb-3 gap-x-2 justify-start'>
+                          <img loading='lazy' className='h-9 w-9 rounded-full object-cover' src={sender && sender.avatar} alt="" />
+                          <div className='flex items-start flex-col justify-start'>
+                            <div className={` ${content.images.length > 0 && 'p-[1px] sm:p-1 md:p-2 mb-[14px]'} relative bg-[#15f5d032] max-w-[200px] sm:max-w-[310px] lg:max-w-[800px] rounded-xl flex flex-col items-start `}>
+                              <div className={` ${content.images.length > 0 ? 'block' : 'hidden'} sm:h-[14px] sm:w-[14px] w-[10px] h-[10px] rounded-[4px] bg-[#15f5d032] cliplow transform rotate-45 absolute -bottom-[5.5px] sm:-bottom-[6.8px] left-5`}></div>
+                              <div className='flex flex-wrap items-end justify-end'>
+                                {
+                                  content.images.length > 0 && content.images.map((i, index) => {
+                                    return <Link to={i.image} key={index} target='_blank' >
+                                      <img src={i.image} className='h-[90px] sm:h-[150px] w-[95px] sm:w-[149px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
+                                    </Link>
+                                  })
+                                }
+                              </div>
+                            </div>
+                            <p className={` ${content.images.length > 0 && ''} white font-sans shadow-lg tracking-wide font-[600] rounded-lg rounded-tl-none text-[14px] lg:text-[16px] px-3 text-stone-600 py-2`}>{content.text}</p>
                             <p className=' text-[#8c8c8c] tracking-wide pl-3 pt-[2px] text-[10px]'>{moment(createdAt).format('LT')}</p>
                           </div>
                         </div>
@@ -370,12 +382,12 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
               </div>
 
               {/* <==> Search bar <==> */}
-              <div className='text-white fixed lg:relative  h-[70px] lg:h-[80px]  px-2 flex items-center justify-center list-gradient bottom-0 left-0 w-full '>
+              <div className='text-white fixed lg:relative h-[60px]  sm:h-[70px] lg:h-[80px]  px-2 flex items-center justify-center list-gradient bottom-0 left-0 w-full '>
                 <div className='flex items-center gap-x-[4px]'>
 
 
                   <label htmlFor="filesvai">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[38px] h-[38px] rounded-lg hover:bg-teal-900 cursor-pointer p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="sm:w-[38px] sm:h-[38px] w-5 h-5 rounded-lg hover:bg-teal-900 cursor-pointer sm:p-2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
                     </svg>
                   </label>
@@ -401,29 +413,29 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                 <div className={`bg-teal-700 ${iconShow ? 'p-3 h-[150px]' : 'h-0 p-0'} overflow-hidden transform duration-[500ms] whitespace-nowrap grid grid-cols-5 absolute bottom-[80px]  rounded-xl`}>
                   <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😻</p>
                   <p onClick={(e) => setmessageText(messageText + '😎')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😎</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😊</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🥲</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😍</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😪</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😭</p>
+                  <p onClick={(e) => setmessageText(messageText + '😊')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😊</p>
+                  <p onClick={(e) => setmessageText(messageText + '🥲')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🥲</p>
+                  <p onClick={(e) => setmessageText(messageText + '😍')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😍</p>
+                  <p onClick={(e) => setmessageText(messageText + '😪')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😪</p>
+                  <p onClick={(e) => setmessageText(messageText + '😭')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😭</p>
                   <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😻</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🪶</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😂</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🤒</p>
-                  <p onClick={(e) => setmessageText(messageText + '😻')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😉</p>
+                  <p onClick={(e) => setmessageText(messageText + '🐸')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🐸</p>
+                  <p onClick={(e) => setmessageText(messageText + '😂')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😂</p>
+                  <p onClick={(e) => setmessageText(messageText + '🤒')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>🤒</p>
+                  <p onClick={(e) => setmessageText(messageText + '😉')} className='text-3xl hover:bg-teal-800 flex justify-center items-center p-1 rounded-lg'>😉</p>
                   <p className='h-5 w-5 rounded-md absolute -bottom-2 right-4 transform rotate-45 bg-teal-700'></p>
                 </div>
 
                 {/* <==> search box <==> */}
-                <div className=' relative h-[50px] mx-1 lg:mx-2  flex-grow flex'>
+                <div className=' relative h-[50px] py-1 sm:py-0 mx-1 lg:mx-2  flex-grow flex'>
 
-                  <input type="text" value={messageText} onFocus={() => seticonShow(false)} onChange={textsendHanler} onKeyDown={hanldeMessageEnter} placeholder='send message ...' className=' font-sans tracking-wide teal font-[500] h-full px-12 text-[18px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
-                  <button className=' absolute rounded-full top-1/2 -translate-y-1/2 left-4 '><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <input type="text" value={messageText} onFocus={() => seticonShow(false)} onChange={textsendHanler} onKeyDown={hanldeMessageEnter} placeholder='send message ...' className=' font-sans tracking-wide teal pl-5 font-[500] text-[13px] h-full sm:px-12 sm:text-[18px] outline-none placeholder:text-[#a7a7a7]  w-full rounded-full' />
+                  <button className=' absolute hidden sm:block rounded-full top-1/2 -translate-y-1/2 left-4 '><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                   </button>
 
-                  <button onClick={() => seticonShow(!iconShow)} className=' absolute rounded-full top-1/2 -translate-y-1/2 right-2 text-[28px] cursor-pointer '>😊 </button>
+                  <button onClick={() => seticonShow(!iconShow)} className=' absolute rounded-full top-1/2 -translate-y-1/2 right-2 text-[18px] sm:text-[28px] cursor-pointer '>😊 </button>
                 </div>
 
                 <button onClick={handleMessageSent} className={`${messageText !== '' || images.length !== 0 ? 'block' : "hidden"}`}>
@@ -433,10 +445,20 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                 </button>
 
                 <p onClick={() => {
+                  if (chatBoxRef.current) {
+                    chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+                  }
+                  if (socket) {
+                    socket.emit('nijerMessageSend', { sender: user._id, chat: openedChat, content: { text: messageText, images }, createdAt: new Date().toLocaleString() })
+                    socket.emit('stopTypeing', openedChat._id)
+                  }
+                  if (chatBoxRef.current) {
+                    chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+                  }
                   messageSent({ text: '👍', images: [] }, chatBoxRef)
                   sendRef.current.play()
                 }}
-                  className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} text-[33px] cursor-pointer`} >👍</p>
+                  className={`sendbtn ${messageText === '' && images.length === 0 ? 'block' : 'hidden'} text-[25px] sm:text-[33px] cursor-pointer`} >👍</p>
               </div>
             </div >
           ) :

@@ -36,7 +36,7 @@ function UserProfile(props) {
         </div>
 
 
-        <div className='mt-2 p-6 flex flex-col gap-y-4'>
+        <div className='mt-2 p-3 sm:p-6 flex flex-col gap-y-4'>
           <div>
             <div onClick={() => setccShow(!ccShow)} className='flex teal-gradient py-2 rounded-full px-4 items-center justify-between'>
               <h1 className=' font-sans capitalize tracking-wider text-white text-[16px] font-[500] whitespace-nowrap	'>Custromize Chat</h1>

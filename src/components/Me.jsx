@@ -9,7 +9,7 @@ import moment from 'moment'
 
 function Me({ setuserListActivetap }) {
 
-  const { user, setuser } = useContext(UserContext)
+  const { user, setuser, authReset, setauthReset } = useContext(UserContext)
   const [selectedAvatar, setselectedAvatar] = useState(null);
   const [selectTheme, setselectTheme] = useState(null);
 
@@ -121,9 +121,8 @@ function Me({ setuserListActivetap }) {
         setaccessHanlderLoading(ac)
         const { data, status } = await axios.put(`https://mesender-serverside-3-0.onrender.com/api/messenger/accessRemove`, { ac: ac }, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 201) {
-          console.log(data)
           user.accessDevices = user.accessDevices && user.accessDevices.filter((accessDevice) => accessDevice !== ac)
-          setuser(user)
+          setauthReset(!authReset)
           toast.success(`${validatorDevice(ac)} - access removed successfully`)
           setaccessHanlderLoading(null)
         }
@@ -143,7 +142,7 @@ function Me({ setuserListActivetap }) {
     else if (upgrateAccessDevice.includes('cpu iphone os 13_2_3 like mac os x')) return 'Iphone Device'
     else if (upgrateAccessDevice.includes('ipad')) return 'Ipad Book'
     else if (upgrateAccessDevice.includes('windows')) return 'Laptop Windows'
-    else 'Unknow Device'
+    else if (upgrateAccessDevice.includes('')) return 'Unknown Device'
   }
 
   return (
@@ -224,6 +223,8 @@ function Me({ setuserListActivetap }) {
 
       </div>
 
+
+
       <div className='mt-4'>
         <p className=' font-sans tracking-wide  text-[#cecece]'>Services</p>
 
@@ -237,7 +238,7 @@ function Me({ setuserListActivetap }) {
             </div>
             <button onClick={() => AvatarHanlder(user._id)} disabled={selectedAvatar ? false : true} className={`p-1 px-2 text-[12px] border-2 ${selectedAvatar ? 'border-green-500 cursor-pointer text-white' : "border-[#757575] text-[#9c9c9c] cursor-not-allowed"}  hover:scale-105 tracking-wide rounded-md`}>{avatarLoading ? <p className='flex items-center gap-x-2'><HashLoader size={20} color='white' />   save</p> : 'save'}</button>
           </div>
-          <div className=' flex items-center gap-3 mt-3 flex-wrap'>
+          <div className=' flex items-center gap-3 mt-2 flex-wrap'>
             {
               avatars.map((i, index) => {
                 return <img key={index} onClick={() => setselectedAvatar(selectedAvatar === i._id ? null : i._id)} loading='lazy' className={` ${selectedAvatar === i._id && 'border-2 border-[#00393a] outline-2 outline-double outline-lime-500'} h-16 w-16 bg-orange-400 rounded-lg object-cover`} src={i.avatar} alt="" />
@@ -246,8 +247,10 @@ function Me({ setuserListActivetap }) {
           </div>
         </div>
 
+
+
         <div>
-          <div className='flex mt-5 justify-between items-center '>
+          <div className='flex mt-4 justify-between items-center '>
             <div className=' flex items-center gap-x-4'>
               <div className='h-10 w-10 flex items-center justify-center bg-teal-600 overflow-hidden rounded-full'>
                 <PiPaintBrushBroad className='text-2xl' />
@@ -256,7 +259,7 @@ function Me({ setuserListActivetap }) {
             </div>
             <button className={`p-1 px-2 text-[12px] border-2 ${selectTheme ? 'border-green-500 cursor-pointer text-white' : "border-[#757575] text-[#9c9c9c] cursor-not-allowed"}  hover:scale-105 tracking-wide rounded-md`}>Save</button>
           </div>
-          <div className='flex mt-3 items-center gap-3 flex-wrap '>
+          <div className='flex mt-2 items-center gap-3 flex-wrap '>
             <p onClick={() => setselectTheme(1)} className={`h-10 ${selectTheme === 1 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-teal-200  rounded-full`}></p>
             <p onClick={() => setselectTheme(2)} className={`h-10 ${selectTheme === 2 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-green-500  rounded-full`}></p>
             <p onClick={() => setselectTheme(4)} className={`h-10 ${selectTheme === 4 && 'border-[3px] border-[#00393a] outline-2 outline-double outline-lime-500'} cursor-pointer w-10 bg-purple-600  rounded-full`}></p>
@@ -280,18 +283,29 @@ function Me({ setuserListActivetap }) {
           {
             user && user.accessDevices.length > 0 && user.accessDevices.map((ac, index) => {
               if (window.navigator.userAgent !== ac.accessDevice) {
-                return <div key={index} className='flex items-center gap-x-3  lg:gap-x-4 '>
-                  <div title={ac.accessDevice} className='text-[14px] font-sans font-[500] tracking-wide pink-gradient p-[6px] w-full rounded-lg px-2 pl-3   lg:px-3 text-[#ffffff]'>
-                    <div className='flex items-center justify-between'>
+                return <div key={index} className='flex items-center gap-x-3 pink-gradient rounded-xl pr-3  lg:gap-x-4 '>
+                  <div title={ac.accessDevice} className='text-[11px] font-sans font-[500] tracking-wide pink-gradient p-[4px] w-full rounded-xl px-2 pl-3   lg:px-3 text-[#ffffff]'>
+                    <div className='flex font-[400] tracking-wide pb-1 text-[12px] items-center justify-between'>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5h3m-6.75 2.25h10.5a2.25 2.25 0 002.25-2.25v-15a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 4.5v15a2.25 2.25 0 002.25 2.25z" />
+                      </svg>
+
                       {validatorDevice(ac.accessDevice)}
-                      <p className='text-[15px] text-[#ffffff]'><span className='text-[14px] tracking-wide font-[600] font-sans '>Last : </span>{moment(ac.createAt).format('LT')}</p>
+                      <p className='text-[11px] px-1 rounded-md  bg-[#0020298a] text-[#ffffff]'><span className='text-[11px] tracking-wide font-[400]  '>Last Update: </span>{moment(ac.createAt).format('LT')}</p>
                     </div>
-                    <p className='text-[11px] text-gray-200 mt-[2px] tracking-wide'> ({ac.accessDevice.slice(0, 35)} ...+) </p>
+
+                    <p className='text-[11px] text-[#dedede] mt-[3px] tracking-wide flex items-center gap-x-1'>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#dedede" className="w-5 h-5 mb-[2px]">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                      <span className=' text-[#fffb00]'></span>{ac.location}</p>
+                    {/* <p className='text-[10px] text-gray-300 mt-[2px] tracking-wide'> ({ac.accessDevice.slice(0, 35)} ...+) </p> */}
                   </div>
-                  <button onClick={() => AccessDeleteHanlder(ac.accessDevice)} className='pink-gradient p-[13px] rounded-lg' title={`delete - ${validatorDevice(ac.accessDevice)}`}>
+                  <button onClick={() => AccessDeleteHanlder(ac.accessDevice)} className='teal-gradient shadow-sm shadow-white p-[5px] rounded-2xl' title={`delete - ${validatorDevice(ac.accessDevice)}`}>
                     {
                       accessHanlderLoading && accessHanlderLoading === ac.accessDevice ?
-                        <HashLoader color='#d0d0d0' size={25} />
+                        <HashLoader color='#d0d0d0' size={22} />
                         :
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -304,6 +318,7 @@ function Me({ setuserListActivetap }) {
           }
         </div>
       </div>
+
 
     </div >
   )

@@ -10,7 +10,7 @@ let socket;
 
 function Messenger() {
 
-  const { user, onlineUsers, setonlineUsers, openedChat, setchatMessages, setopenedChat, setseen } = useContext(UserContext)
+  const { offlineUsers, setofflineUsers, user, onlineUsers, setonlineUsers, openedChat, setchatMessages, setopenedChat, setseen } = useContext(UserContext)
   const [userProfileShow, setuserProfileShow] = useState(false);
 
   useEffect(() => {
@@ -31,9 +31,10 @@ function Messenger() {
     socket = io('https://mesender-serverside-3-0.onrender.com')
 
     if (socket && user) {
+
       socket.emit('addUser', user)
 
-      socket.on('sobUsers', (users) => {
+      socket.on('sobUsers', ({ users, activeUser }) => {
         setonlineUsers(users)
       })
 
@@ -46,8 +47,6 @@ function Messenger() {
       })
 
       socket.on('reciveMessage', (props) => {
-        // openedChat.latestMessage = props
-        // setopenedChat(openedChat)'
         reciveRef.current.play()
         setchatMessages(prev => [...prev, props])
         if (chatBoxRef.current) {
@@ -55,16 +54,26 @@ function Messenger() {
         }
       })
 
+      return () => {
+        socket.off('sobUsers')
+        socket.off('pullUsers')
+        socket.off('seen2')
+        socket.off('reciveMessage')
+      }
+
     }
+
   }, []);
+
+
 
   return (
     <div className='flex h-screen overflow-hidden w-full relative justify-center'>
 
       <audio ref={reciveRef} className='' src="./wp-message-recive.mp3"></audio>
 
-
-      <div className={`${openedChat ? 'hidden lg:block' : "block"} w-full  md:w-[430px] overflow-hidden text-white light-teal`}>
+      {/* 1024 768*/}
+      <div className={`${openedChat ? 'hidden  lg:block' : "block"} w-full  md:w-[430px] overflow-hidden text-white light-teal`}>
         <UserList socket={socket} onlineUsers={onlineUsers} setonlineUsers={setonlineUsers} />
       </div>
       <div className={`${openedChat ? 'block' : "hidden lg:block"} flex-grow teal h-screen`}>
