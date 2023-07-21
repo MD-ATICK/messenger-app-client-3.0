@@ -29,6 +29,7 @@ function Login() {
                 if (locationData) {
                     const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                     if (status === 201) {
+                        localStorage.setItem('notice', 'new')
                         setuser(data.user)
                         localStorage.setItem('v3token', data.v3token)
                         setLoginLoading(false)
@@ -50,8 +51,20 @@ function Login() {
         }
     }
 
-    const [x, setx] = useState(true);
 
+    const authUser = async (token) => {
+        const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        if (status === 200) {
+            navigate('/')
+        }
+    }
+
+    useEffect(() => {
+        const token = localStorage.getItem('v3token')
+        if (token) {
+            authUser(token)
+        }
+    }, []);
 
     return (
         <div className="w-full bg-[#00393a] p-2 sm:p-4 relative h-screen clippath grid place-items-center">

@@ -255,7 +255,7 @@ function Me({ setuserListActivetap }) {
               <div className='h-10 w-10 flex items-center justify-center bg-teal-600 overflow-hidden rounded-full'>
                 <PiPaintBrushBroad className='text-2xl' />
               </div>
-              <p className=' font-sans tracking-wide'>Theme (select)</p>
+              <p className=' font-sans tracking-wide'>Theme (select) <span className='text-[12px] text-[#cecece] tracking-wide'>(comming soon)</span></p>
             </div>
             <button className={`p-1 px-2 text-[12px] border-2 ${selectTheme ? 'border-green-500 cursor-pointer text-white' : "border-[#757575] text-[#9c9c9c] cursor-not-allowed"}  hover:scale-105 tracking-wide rounded-md`}>Save</button>
           </div>
@@ -302,7 +302,7 @@ function Me({ setuserListActivetap }) {
                       <span className=' text-[#fffb00]'></span>{ac.location}</p>
                     {/* <p className='text-[10px] text-gray-300 mt-[2px] tracking-wide'> ({ac.accessDevice.slice(0, 35)} ...+) </p> */}
                   </div>
-                  <button onClick={() => AccessDeleteHanlder(ac.accessDevice)} className='teal-gradient shadow-sm shadow-white p-[5px] rounded-2xl' title={`delete - ${validatorDevice(ac.accessDevice)}`}>
+                  <button onClick={() => AccessDeleteHanlder(ac.accessDevice)} className='teal-gradient shadow-white p-[5px] rounded-2xl' title={`delete - ${validatorDevice(ac.accessDevice)}`}>
                     {
                       accessHanlderLoading && accessHanlderLoading === ac.accessDevice ?
                         <HashLoader color='#d0d0d0' size={22} />

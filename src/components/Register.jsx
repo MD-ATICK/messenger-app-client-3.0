@@ -20,14 +20,6 @@ function Register() {
     const { setuser, reset, setreset } = useContext(UserContext)
 
 
-    const success = async (position) => {
-        const latitude = position.coords.latitude
-        const longitude = position.coords.longitude
-
-        const { data } = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
-        return `${data.locality} , ${data.principalSubdivision} , ${data.countryName}`
-    }
-
     const RegisterHanlder = async () => {
         if (username === '' || email === '' || password === '' || avatar === '') return toast.error('Sob feild gula porun korun.')
         try {
@@ -47,6 +39,7 @@ function Register() {
                         const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/register`, { username, email, password, avatar: url, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                         if (status === 201) {
                             setuser(data.createUser)
+                            localStorage.setItem('notice', 'new')
                             localStorage.setItem('v3token', data.v3token)
                             setregisterLoading(false)
                             setreset(!reset)
@@ -85,6 +78,20 @@ function Register() {
 
         reader.readAsDataURL(file);
     }
+
+    const authUser = async (token) => {
+        const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        if (status === 200) {
+            navigate('/')
+        }
+    }
+
+    useEffect(() => {
+        const token = localStorage.getItem('v3token')
+        if (token) {
+            authUser(token)
+        }
+    }, []);
 
 
     return (

@@ -15,6 +15,18 @@
 
 
 }
+.text-gradient{
+  background: -webkit-linear-gradient(#ffffff, #6e6e6e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+}
+.text-gradient-white{
+  background: -webkit-linear-gradient(#2c2c2c, #6e6e6e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+}
 
 .light-teal {
   background-color: #00393a;
@@ -76,22 +88,28 @@
 .image-selected {
   /* background-blend-mode: multiply; */
   background-color: #030303b4;
-  
+
 }
-.list-gradient{
+
+.list-gradient {
   background: linear-gradient(274deg, #002627 0%, #024a4c 70%);
 
 }
 
-.font-jo{
+.font-jo {
   font-family: 'Ubuntu', sans-serif;
 }
-.cliplow{
+
+.cliplow {
   clip-path: polygon(100% 0, 0 100%, 100% 100%);
 
 }
 
-.pink-gradient{
-  background: linear-gradient(274deg, rgba(223,0,140,0.8076923076923077) 0%, rgba(110,0,182,1) 61%, rgba(5,115,255,0.5728744939271255) 100%);
+.pink-gradient {
+  background: linear-gradient(274deg, rgba(223, 0, 140, 0.8076923076923077) 0%, rgba(110, 0, 182, 1) 61%, rgba(5, 115, 255, 0.5728744939271255) 100%);
 
+}
+
+.letters {
+  letter-spacing: 0.4px;
 }

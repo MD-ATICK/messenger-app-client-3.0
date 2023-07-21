@@ -24,11 +24,12 @@ function Messenger() {
   const reciveRef = useRef()
 
 
-
-
-
   useEffect(() => {
     socket = io('https://mesender-serverside-3-0.onrender.com')
+
+    if (window.innerWidth >= 1100) {
+      setuserProfileShow(true)
+    }
 
     if (socket && user) {
 
@@ -36,6 +37,14 @@ function Messenger() {
 
       socket.on('sobUsers', ({ users, activeUser }) => {
         setonlineUsers(users)
+        const Localstg_offline_users = localStorage.getItem('20m_ago_u')
+        if (Localstg_offline_users) {
+          const m = localStorage.getItem('20m_ago_u')
+          const parseM = JSON.parse(m)
+          const filteredUsers = parseM.filter((lsUser) => lsUser._id !== activeUser._id)
+          localStorage.setItem('20m_ago_u', JSON.stringify(filteredUsers))
+          return setofflineUsers(prev => prev + 1)
+        }
       })
 
       socket.on('pullUsers', (users) => {
@@ -63,6 +72,8 @@ function Messenger() {
 
     }
 
+
+
   }, []);
 
 
@@ -71,7 +82,7 @@ function Messenger() {
     <div className='flex h-screen overflow-hidden w-full relative justify-center'>
 
       <audio ref={reciveRef} className='' src="./wp-message-recive.mp3"></audio>
-
+    
       {/* 1024 768*/}
       <div className={`${openedChat ? 'hidden  lg:block' : "block"} w-full  md:w-[430px] overflow-hidden text-white light-teal`}>
         <UserList socket={socket} onlineUsers={onlineUsers} setonlineUsers={setonlineUsers} />
@@ -79,8 +90,8 @@ function Messenger() {
       <div className={`${openedChat ? 'block' : "hidden lg:block"} flex-grow teal h-screen`}>
         <UserChatBox setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} chatBoxRef={chatBoxRef} socket={socket} />
       </div>
-      <div className={` ${userProfileShow ? ' w-full lg:w-[320px]' : 'w-0'} tikkoren h-screen overflow-y-scroll duration-500 transform `}>
-        <UserProfile setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} />
+      <div className={` ${userProfileShow && openedChat ? ' w-full lg:w-[320px]' : 'w-0'} tikkoren h-screen overflow-y-scroll duration-500 transform `}>
+        <UserProfile socket={socket} setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} />
       </div>
 
     </div>
