@@ -185,7 +185,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                                     if (Math.floor(min) < 20) {
                                         return <div onClick={() => onlineUserHanlder(u)} key={index} title='online user' className=' relative mr-2 cursor-pointer'>
                                             <img className='h-10 w-10 shadow-sm shadow-white rounded-full object-cover' src={u.avatar && u.avatar} alt="" />
-                                            <p className={`h-[16px] w-[16px] text-[6px] shadow-sm shadow-white  flex justify-center items-center letters absolute top-[0px] -right-[4px] bg-black text-white rounded-full`}>
+                                            <p className={`h-[16px] w-[16px] text-[6px] shadow-sm shadow-white  flex justify-center items-center letters absolute top-[0px] -right-[4px] bg-stone-800 text-white rounded-full`}>
                                                 {Math.floor(min) + 'm'}
                                             </p>
                                         </div>

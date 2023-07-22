@@ -76,7 +76,7 @@ function Login() {
                     <img src="/hero_img.png" alt="" />
                 </div>
                 <div className='w-full md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-3 py-6 px-4 sm:p-10'>
-                    <h1 className=' text-[26px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[30px] sm:text-[34px] text-gradient'>Dark Chat</h1>
+                    <h1 className=' text-[25px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[30px] sm:text-[35px] text-gradient'>Dark Chat</h1>
                         Login</h1>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Email</label>

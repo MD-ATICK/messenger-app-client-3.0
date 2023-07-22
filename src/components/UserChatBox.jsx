@@ -141,10 +141,12 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
         socket.emit('blockStatus', { chat: data.chat, user })
       }
     }
+
   }
 
-
   useEffect(() => {
+
+    console.log('online', onlineUsers)
 
     if (socket) {
 
@@ -152,17 +154,24 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
         setTypeing(sender);
       });
 
-      socket.on('offlineUser_15m', (pUser) => {
+      socket.on('offlineUser_15m', (socketid) => {
+        console.log('socketid ol', socketid)
         const Localstg_offline_users = localStorage.getItem('20m_ago_u')
-        if (Localstg_offline_users && pUser) {
+        if (Localstg_offline_users && socketid) {
           const m = localStorage.getItem('20m_ago_u')
           const parseM = JSON.parse(m)
-          const realOfflineUser = parseM.filter((u) => u._id !== pUser._id)
-          localStorage.setItem('20m_ago_u', JSON.stringify([...realOfflineUser, { ...pUser, offlinedtime: Date.now() }]))
+          const pUser = onlineUsers.length > 0 && onlineUsers.find((u) => u.socketid === socketid)
+          console.log(pUser)
+          const realOfflineUser = pUser && parseM.filter((u) => u._id !== pUser._id)
+          pUser && localStorage.setItem('20m_ago_u', JSON.stringify([...realOfflineUser, { ...pUser, offlinedtime: Date.now() }]))
           return setofflineUsers(prev => prev + 1)
         }
-        localStorage.setItem('20m_ago_u', JSON.stringify([{ ...pUser, offlinedtime: Date.now() }]))
-        setofflineUsers(prev => prev + 1)
+        if (socketid) {
+          const pUser = onlineUsers.length > 0 && onlineUsers.find((u) => u.socketid === socketid)
+          console.log(pUser)
+          pUser && localStorage.setItem('20m_ago_u', JSON.stringify([{ ...pUser, offlinedtime: Date.now() }]))
+          setofflineUsers(prev => prev + 1)
+        }
       })
 
       socket.on('responseBlockStatus', (chat) => {
@@ -514,7 +523,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                     </div>
                   </div>
                   :
-                  <div className={` ${openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] absolute bottom-0 left-0`}>
+                  <div className={` ${openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
                     <div className=''>
                       <p className=' text-center font-[600] text-[17px]'><span className=' capitalize'>{FindotherUser.username}</span> Blocked You <span className='text-[13px] font-[500] tracking-wide text-[#424242]'>({moment(openedChat.lastBlockAt).startOf('min').fromNow()})</span></p>
                       <p className='text-[13px] tracking-wide text-center text-[#868686] mt-2'>You cann't messange to <span className='text-black capitalize font-[600]'>{FindotherUser.username} </span> and he wouldn't able to message to you.</p>

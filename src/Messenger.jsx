@@ -27,6 +27,8 @@ function Messenger() {
   useEffect(() => {
     socket = io('https://mesender-serverside-3-0.onrender.com')
 
+    localStorage.setItem('20m_ago_u', [])
+
     if (window.innerWidth >= 1100) {
       setuserProfileShow(true)
     }
@@ -82,7 +84,7 @@ function Messenger() {
     <div className='flex h-screen overflow-hidden w-full relative justify-center'>
 
       <audio ref={reciveRef} className='' src="./wp-message-recive.mp3"></audio>
-    
+
       {/* 1024 768*/}
       <div className={`${openedChat ? 'hidden  lg:block' : "block"} w-full  md:w-[430px] overflow-hidden text-white light-teal`}>
         <UserList socket={socket} onlineUsers={onlineUsers} setonlineUsers={setonlineUsers} />

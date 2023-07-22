@@ -49,13 +49,17 @@ const ContextProvider = ({ children }) => {
     }
 
     const LogoutUser = (socket) => {
-        const Localstg_offline_users = localStorage.getItem('20m_ago_u')
-        if (Localstg_offline_users && user) {
-            const m = localStorage.getItem('20m_ago_u')
-            const parseM = JSON.parse(m)
-            const filteredUsers = parseM.filter((lsUser) => lsUser._id !== user._id)
-            localStorage.setItem('20m_ago_u', JSON.stringify(filteredUsers))
-            setofflineUsers(prev => prev + 1)
+        // const Localstg_offline_users = localStorage.getItem('20m_ago_u')
+        // if (Localstg_offline_users && user) {
+        //     console.log('direct ol')
+        //     const m = localStorage.getItem('20m_ago_u')
+        //     const parseM = JSON.parse(m)
+        //     const filteredUsers = parseM.filter((lsUser) => lsUser._id !== user._id)
+        //     localStorage.setItem('20m_ago_u', JSON.stringify(filteredUsers))
+        //     setofflineUsers(prev => prev + 1)
+        // }
+        if (user) {
+            socket.emit('hash')
         }
         localStorage.removeItem('v3token')
         if (socket) {
