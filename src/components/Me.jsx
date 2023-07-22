@@ -59,7 +59,7 @@ function Me({ setuserListActivetap }) {
       form.append('image', file)
       const { data: { data: { url } }, status: ibbStatus } = await axios.post(`https://api.imgbb.com/1/upload?key=6226ca30d95b139a79184223cfbc266a`, form)
       if (ibbStatus === 200) {
-        const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/avatarUpdate`, { avatar: url, userid: user._id }, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/avatarUpdate`, { avatar: url, userid: user._id }, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 201) {
           setuser(data.user)
           setdirect_avatar_loading(false)
@@ -79,7 +79,7 @@ function Me({ setuserListActivetap }) {
     setavatarLoading(true)
 
     try {
-      const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/avatarUpdate`, { avatar: avatars.find((avatar) => avatar._id === selectedAvatar).avatar, userid: userid }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/avatarUpdate`, { avatar: avatars.find((avatar) => avatar._id === selectedAvatar).avatar, userid: userid }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         setavatarLoading(false)
         setuser(data.user)
@@ -98,7 +98,7 @@ function Me({ setuserListActivetap }) {
     setusernameLoading(true)
 
     try {
-      const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/usrenameUpdate`, { username, userid: user && user._id }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/usrenameUpdate`, { username, userid: user && user._id }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         setusernameLoading(false)
         setuser(data.user)
@@ -119,7 +119,7 @@ function Me({ setuserListActivetap }) {
     if (user) {
       try {
         setaccessHanlderLoading(ac)
-        const { data, status } = await axios.put(`https://mesender-serverside-3-0.onrender.com/api/messenger/accessRemove`, { ac: ac }, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.put(`https://faltu-serverside-md-atick.vercel.app/api/messenger/accessRemove`, { ac: ac }, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 201) {
           user.accessDevices = user.accessDevices && user.accessDevices.filter((accessDevice) => accessDevice !== ac)
           setauthReset(!authReset)

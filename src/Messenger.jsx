@@ -25,6 +25,7 @@ function Messenger() {
 
 
   useEffect(() => {
+    // socket = io('https://faltu-serverside-md-atick.vercel.app')
     socket = io('https://mesender-serverside-3-0.onrender.com')
 
     localStorage.setItem('20m_ago_u', [])

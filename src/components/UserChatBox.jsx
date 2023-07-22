@@ -114,7 +114,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
   const unseenFetch = async ({ message, chatid }) => {
     const token = localStorage.getItem('v3token')
-    const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/chat/unseen/${chatid}`, {
+    const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/chat/unseen/${chatid}`, {
       thisMessage: {
         chat: message.chat._id,
         content: message.content,
@@ -131,7 +131,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
     if (openedChat && socket && user && chats) {
       setblockLoading(true)
       const token = localStorage.getItem('v3token')
-      const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         toast.success('User UnBlocked Succesfully')
         setblockLoading(false)

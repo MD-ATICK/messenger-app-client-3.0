@@ -58,7 +58,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
             chater.unseenMessages = []
             setopenedChat(chater)
             socket.emit('unempty', { chat: chat, userid: user._id })
-            const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/unseenRemove', { chatid: chat._id }, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/unseenRemove', { chatid: chat._id }, { headers: { Authorization: `Bearer ${token}` } })
         } else {
             setopenedChat(chat)
         }
@@ -78,7 +78,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                 chater.unseenMessages = []
                 setopenedChat(chater)
                 socket.emit('unempty', { chat: chater, userid: user._id })
-                const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/unseenRemove', { chatid: chater._id }, { headers: { Authorization: `Bearer ${token}` } })
+                const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/unseenRemove', { chatid: chater._id }, { headers: { Authorization: `Bearer ${token}` } })
             } else {
                 setopenedChat(chater)
             }

@@ -27,7 +27,7 @@ function Login() {
 
                 const { data: locationData } = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
                 if (locationData) {
-                    const { data, status } = await axios.post(`https://mesender-serverside-3-0.onrender.com/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
+                    const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                     if (status === 201) {
                         localStorage.setItem('notice', 'new')
                         setuser(data.user)
@@ -54,7 +54,7 @@ function Login() {
 
     const authUser = async (token) => {
         const x = window.navigator.userAgent
-        const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 200 && data.user.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
         } else if (status === 223) {
@@ -72,11 +72,11 @@ function Login() {
     return (
         <div className="w-full bg-[#00393a] p-2 sm:p-4 relative h-screen clippath flex flex-col justify-center items-center">
             <div className='max-w-5xl bg-[#003031] p-0 flex justify-between shadow-lg rounded-2xl w-full border-white mx-auto'>
-                <div className=' md:flex-[0.6] md:p-6 justify-center items-center hidden md:flex rounded-2xl'>
+                <div className=' md:flex-[0.5] md:p-6 justify-center items-center hidden md:flex rounded-2xl'>
                     <img src="/hero_img.png" alt="" />
                 </div>
                 <div className='w-full md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-3 py-6 px-4 sm:p-10'>
-                    <h1 className=' text-[25px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[30px] sm:text-[35px] text-gradient'>Dark Chat</h1>
+                    <h1 className=' text-[20px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[25px] sm:text-[35px] text-gradient'>Dark Chat</h1>
                         Login</h1>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Email</label>
