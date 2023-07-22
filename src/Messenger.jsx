@@ -90,7 +90,7 @@ function Messenger() {
       <div className={`${openedChat ? 'block' : "hidden lg:block"} flex-grow teal h-screen`}>
         <UserChatBox setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} chatBoxRef={chatBoxRef} socket={socket} />
       </div>
-      <div className={` ${userProfileShow && openedChat ? ' w-full lg:w-[320px]' : 'w-0'} tikkoren h-screen overflow-y-scroll duration-500 transform `}>
+      <div className={` ${userProfileShow && openedChat ? ' w-full md:w-[400px]' : 'w-0'} tikkoren h-screen overflow-y-scroll duration-500 transform `}>
         <UserProfile socket={socket} setuserProfileShow={setuserProfileShow} userProfileShow={userProfileShow} />
       </div>
 

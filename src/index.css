@@ -15,6 +15,11 @@
 
 
 }
+
+.black-gradient{
+  background: linear-gradient(0deg, rgba(163,163,163,1) 0%, rgba(255,255,255,1) 100%);
+
+}
 .text-gradient{
   background: -webkit-linear-gradient(#ffffff, #6e6e6e);
   -webkit-background-clip: text;

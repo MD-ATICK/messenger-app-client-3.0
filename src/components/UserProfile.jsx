@@ -3,12 +3,12 @@ import { UserContext } from '../../provider/ContextPorvider'
 import axios from 'axios';
 import { PulseLoader } from 'react-spinners'
 import { toast } from 'react-hot-toast';
-import Swal from 'sweetalert2';
+import { AiFillUnlock } from 'react-icons/ai'
 
 
 function UserProfile({ userProfileShow, setuserProfileShow, socket }) {
 
-  const { openedChat, setopenedChat, onlineUsers, user, chatMessages } = useContext(UserContext)
+  const { openedChat, setopenedChat, onlineUsers, user, chatMessages, chats, setchats } = useContext(UserContext)
 
   const [ccShow, setccShow] = useState(false);
   const [ppShow, setppShow] = useState(false);
@@ -18,34 +18,27 @@ function UserProfile({ userProfileShow, setuserProfileShow, socket }) {
   const otherUser = openedChat && user && openedChat.users.find((c) => c._id.toString() !== user._id.toString())
 
 
-  const Blockchat = (blockCondition) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `You want to ${blockCondition ? 'block' : 'unblock'} ${otherUser.username}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      width: '350px',
-      confirmButtonText: 'Yes, delete it!'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        if (openedChat && socket && user) {
-          const token = localStorage.getItem('v3token')
-          setblockLoading(true)
-          const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: blockCondition }, { headers: { Authorization: `Bearer ${token}` } })
-          if (status === 201) {
-            data.condition = true ? toast.success('User Blocked Succesfully') : toast.success('User UnBlocked Succesfully')
-            setblockLoading(false)
-            setopenedChat(data.chat)
-            socket.emit('blockStatus', { chat: data.chat, user })
-            console.log(data)
-          }
+  const Blockchat = async (blockCondition) => {
+    if (openedChat && socket && user && chats) {
+      setblockLoading(true)
+      const token = localStorage.getItem('v3token')
+      const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: blockCondition }, { headers: { Authorization: `Bearer ${token}` } })
+      if (status === 201) {
+        data.condition === true ? toast.success('User Blocked Succesfully') : toast.success('User UnBlocked Succesfully')
+        setblockLoading(false)
+        openedChat.chatBlockedBy = data.condition === true ? user._id : "none"
+        setopenedChat(data.chat)
+        console.log({ openedChat, data: data.chat })
+        socket.emit('blockStatus', { chat: data.chat, user })
+        if (data.condition === true) {
+          chats.find((c) => c._id === openedChat._id).chatBlockedBy = user._id
+          return setchats(chats)
         }
+        chats.find((c) => c._id === openedChat._id).chatBlockedBy = "none"
+        setchats(chats)
       }
-    })
+    }
   }
-  openedChat && user && console.log({ 'openedChat': openedChat, 'user': user })
 
   return (
     openedChat &&
@@ -79,10 +72,28 @@ function UserProfile({ userProfileShow, setuserProfileShow, socket }) {
         </div>
 
         <div className='px-4'>
-          <button className={` ${openedChat && openedChat.chatBlockedBy === 'none' ? 'block' : 'hidden'} pink-gradient mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(true)}>{blockLoading ? <PulseLoader color='white' size={17} /> : 'Block User'}</button>
+          {
+            blockLoading ?
+              <button className={` ${openedChat && openedChat.chatBlockedBy === 'none' ? 'block' : 'hidden'} pink-gradient mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(true)}> <PulseLoader color='white' size={17} /></button>
+              :
+              <button className={` ${openedChat && openedChat.chatBlockedBy === 'none' ? 'block' : 'hidden'} pink-gradient flex gap-x-3 items-center justify-center mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(true)}>Block User
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#565656" className="w-6 rounded-full bg-white h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                </svg>
+
+
+              </button>
+          }
         </div>
         <div className='px-4'>
-          <button className={` ${openedChat && user && openedChat.chatBlockedBy !== 'none' && openedChat.chatBlockedBy === user._id ? 'flex' : 'hidden'} pink-gradient justify-center items-center mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(false)}> {blockLoading ? <PulseLoader color='white' size={17} /> : 'UnBlock User'}</button>
+          {
+            blockLoading ?
+              <button className={` ${openedChat && user && openedChat.chatBlockedBy !== 'none' && openedChat.chatBlockedBy === user._id ? 'flex' : 'hidden'} pink-gradient justify-center items-center mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(false)}> <PulseLoader color='white' size={17} /></button>
+              :
+              <button className={` ${openedChat && user && openedChat.chatBlockedBy !== 'none' && openedChat.chatBlockedBy === user._id ? 'flex' : 'hidden'} pink-gradient flex gap-3 justify-center items-center mt-6 mx-auto font-[600] w-full rounded-xl py-4 px-4 text-white font-sans tracking-wide text-[16px] text-center`} onClick={() => Blockchat(false)}> UnBlock User
+                <AiFillUnlock className='text-[25px]' />
+              </button>
+          }
         </div>
 
 

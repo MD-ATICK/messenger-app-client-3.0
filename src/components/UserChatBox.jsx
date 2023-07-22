@@ -8,8 +8,8 @@ import { ClipLoader, PulseLoader, ScaleLoader } from 'react-spinners'
 import moment from 'moment'
 import { MdOutlineDoneAll } from 'react-icons/md'
 import { toast } from 'react-hot-toast'
-import { HiOutlineMinus } from 'react-icons/hi'
-import Swal from 'sweetalert2'
+import { AiFillUnlock } from 'react-icons/ai'
+import { AiOutlineEye } from 'react-icons/ai'
 
 function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }) {
 
@@ -128,30 +128,19 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   }
 
   const Blockchat = async () => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `You want to unblock ${otherUser.username}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      width: '350px',
-      confirmButtonText: 'Yes, delete it!'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        if (openedChat && socket && user) {
-          setblockLoading(true)
-          const token = localStorage.getItem('v3token')
-          const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
-          if (status === 201) {
-            toast.success('User UnBlocked Succesfully')
-            setblockLoading(false)
-            setopenedChat(data.chat)
-            socket.emit('blockStatus', { chat: data.chat, user })
-          }
-        }
+    if (openedChat && socket && user && chats) {
+      setblockLoading(true)
+      const token = localStorage.getItem('v3token')
+      const { data, status } = await axios.put('https://mesender-serverside-3-0.onrender.com/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
+      if (status === 201) {
+        toast.success('User UnBlocked Succesfully')
+        setblockLoading(false)
+        setopenedChat(data.chat)
+        chats.find((c) => c._id === openedChat._id).chatBlockedBy = "none"
+        setchats(chats)
+        socket.emit('blockStatus', { chat: data.chat, user })
       }
-    })
+    }
   }
 
 
@@ -164,10 +153,8 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
       });
 
       socket.on('offlineUser_15m', (pUser) => {
-        console.log('pUser', pUser)
-        // const upgrateOfflineUsers = offlineUsers.filter((oUser) => oUser._id !== pUser._id)
         const Localstg_offline_users = localStorage.getItem('20m_ago_u')
-        if (Localstg_offline_users) {
+        if (Localstg_offline_users && pUser) {
           const m = localStorage.getItem('20m_ago_u')
           const parseM = JSON.parse(m)
           const realOfflineUser = parseM.filter((u) => u._id !== pUser._id)
@@ -183,6 +170,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
           if (openedChat) {
             return setopenedChat(chat)
           }
+          console.log('out of room run ...')
           let f = chats.find((c) => c._id === chat._id)
           f.chatBlockedBy = chat.chatBlockedBy
           f.lastBlockAt = chat.lastBlockAt
@@ -270,6 +258,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
   }, [allmsgLoading]);
 
   let x = null;
+
 
 
   return (
@@ -511,19 +500,28 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
               {
                 openedChat && user && openedChat.chatBlockedBy !== "none" && openedChat.chatBlockedBy === user._id ?
-                  <div className={`h-[200px]  transform duration-[500ms] p-5 w-full bg-white rounded-tr-[30px] rounded-tl-[30px] absolute bottom-0 left-0`}>
+                  <div className={`h-[200px] transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
                     <div className=''>
                       <p className=' text-center font-[600] text-[17px]'>You Blocked {FindotherUser.username}</p>
                       <p className='text-[13px] tracking-wide text-center text-[#868686] mt-2'>You cann't messange to <span className='text-black capitalize font-[600]'>{FindotherUser.username} </span> and he wouldn't able to message to you.</p>
-                      <button className={`bg-[#b9b9b9] mt-6 mx-auto font-[600] w-full rounded-xl py-4 text-black tracking-wider text-[17px] text-center`} onClick={() => Blockchat()}>{blockLoading ? <PulseLoader color='#5c5c5c' size={17} /> : `UnBlock user`}</button>
+                      {
+                        blockLoading ?
+                          <button className={`teal-gradient mt-6 mx-auto font-[600] w-full rounded-xl py-4 text-white tracking-wider text-[17px] text-center`} onClick={() => Blockchat()}><PulseLoader color='white' size={17} /></button>
+                          :
+                          <button className={`teal-gradient mt-6 mx-auto font-[600]  flex items-center gap-2 justify-center w-full rounded-xl py-4 text-white tracking-wider text-[17px] text-center`} onClick={() => Blockchat()}>UnBlock user
+                            <AiFillUnlock className='text-[25px]' />
+                          </button>
+                      }
                     </div>
                   </div>
                   :
-                  <div className={` ${openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full bg-white rounded-tr-[30px] rounded-tl-[30px] absolute bottom-0 left-0`}>
+                  <div className={` ${openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] absolute bottom-0 left-0`}>
                     <div className=''>
                       <p className=' text-center font-[600] text-[17px]'><span className=' capitalize'>{FindotherUser.username}</span> Blocked You <span className='text-[13px] font-[500] tracking-wide text-[#424242]'>({moment(openedChat.lastBlockAt).startOf('min').fromNow()})</span></p>
                       <p className='text-[13px] tracking-wide text-center text-[#868686] mt-2'>You cann't messange to <span className='text-black capitalize font-[600]'>{FindotherUser.username} </span> and he wouldn't able to message to you.</p>
-                      <button className={`bg-[#b9b9b9] mt-6 mx-auto font-[600] w-full rounded-xl py-4 text-black tracking-wider text-[17px] text-center`} onClick={() => setuserProfileShow(true)}>See Profile</button>
+                      <button className={`teal-gradient mt-6 mx-auto flex items-center gap-x-2 justify-center font-[600] w-full rounded-xl py-4 text-white tracking-wider text-[17px] text-center`} onClick={() => setuserProfileShow(true)}>See Profile
+                        <AiOutlineEye className='text-[25px]' />
+                      </button>
                     </div>
                   </div>
               }

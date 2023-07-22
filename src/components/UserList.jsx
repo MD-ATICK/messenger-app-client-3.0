@@ -43,6 +43,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
 
     const logoutkorle = () => {
         // localStorage.setItem('notice', 'new')
+        alert('are you sure?')
         LogoutUser(socket)
     }
 
@@ -106,6 +107,8 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
             return setdetailsShow(true)
         }
     }, []);
+
+
 
     return (
         userListActivetap === 1 ?
@@ -174,8 +177,8 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                             })}
                         </div>
                         <div className={`${xyz ? 'flex' : 'hidden'} items-center gap-x-2`}>
-                            {user && chats && resetcount && offlineUsers && xyz && xyz.map((u, index) => {
-                                const valid = onlineUsers.find((user) => user._id.toString() === u._id.toString())
+                            {user && chats && resetcount && offlineUsers && xyz && xyz.length > 0 && xyz.map((u, index) => {
+                                const valid = onlineUsers.length > 0 && onlineUsers.find((user) => user._id.toString() === u._id.toString())
                                 if (!valid) {
                                     const sec = (Date.now() - u.offlinedtime) / 1000
                                     const min = sec / 60

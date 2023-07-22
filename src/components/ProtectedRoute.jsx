@@ -14,13 +14,12 @@ function ProtectedRoute({ children }) {
 
     const { user, authLoading } = useContext(UserContext)
 
-
     if (authLoading && !user) {
         return <Loader />
     } else {
         if (v3token && user && !authLoading) {
             const x = window.navigator.userAgent
-            if (user.accessDevices.find((ac) => ac.accessDevice.toLowerCase() === x.toLowerCase())) {
+            if (user.accessDevices.find((ac) => ac.accessDevice === x)) {
                 return children
             } else {
                 return <Navigate to='/messenger/login' state={{ form: location }} replace={true}></Navigate>

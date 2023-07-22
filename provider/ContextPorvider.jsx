@@ -1,5 +1,4 @@
 import axios from "axios";
-import Swal from 'sweetalert2'
 import { Navigate, useNavigate } from 'react-router-dom'
 import React, { createContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -50,35 +49,22 @@ const ContextProvider = ({ children }) => {
     }
 
     const LogoutUser = (socket) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You would want to Logout!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, Logout!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const Localstg_offline_users = localStorage.getItem('20m_ago_u')
-                if (Localstg_offline_users && user) {
-                    const m = localStorage.getItem('20m_ago_u')
-                    const parseM = JSON.parse(m)
-                    const filteredUsers = parseM.filter((lsUser) => lsUser._id !== user._id)
-                    localStorage.setItem('20m_ago_u', JSON.stringify(filteredUsers))
-                    setofflineUsers(prev => prev + 1)
-                }
-                localStorage.removeItem('v3token')
-                if (socket) {
-                    openedChat && socket.emit('leaveRoom', openedChat._id)
-                    socket.emit('removeAction', user._id)
-                    socket.disconnect();
-                }
-                setuser(null)
-                setopenedChat(null)
-            }
-        })
-
+        const Localstg_offline_users = localStorage.getItem('20m_ago_u')
+        if (Localstg_offline_users && user) {
+            const m = localStorage.getItem('20m_ago_u')
+            const parseM = JSON.parse(m)
+            const filteredUsers = parseM.filter((lsUser) => lsUser._id !== user._id)
+            localStorage.setItem('20m_ago_u', JSON.stringify(filteredUsers))
+            setofflineUsers(prev => prev + 1)
+        }
+        localStorage.removeItem('v3token')
+        if (socket) {
+            openedChat && socket.emit('leaveRoom', openedChat._id)
+            socket.emit('removeAction', user._id)
+            socket.disconnect();
+        }
+        setuser(null)
+        setopenedChat(null)
     }
 
     const Users = async () => {

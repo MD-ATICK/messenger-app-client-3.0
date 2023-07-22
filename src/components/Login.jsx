@@ -41,10 +41,10 @@ function Login() {
                     }
                 }
 
-            }, (err) => {
+            }, (error) => {
                 toast.error('Age location trun on Korun.')
                 setLoginLoading(false)
-                console.log(err)
+                console.log(error)
             })
         } catch (error) {
             console.log(error)
@@ -53,9 +53,12 @@ function Login() {
 
 
     const authUser = async (token) => {
+        const x = window.navigator.userAgent
         const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
-        if (status === 200) {
+        if (status === 200 && data.user.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
+        } else if (status === 223) {
+            navigate('/messenger/register')
         }
     }
 

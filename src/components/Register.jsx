@@ -81,8 +81,10 @@ function Register() {
 
     const authUser = async (token) => {
         const { data, status } = await axios.get(`https://mesender-serverside-3-0.onrender.com/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
-        if (status === 200) {
+        if (status === 200 && data.createUser.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
+        } else if (status === 223) {
+            navigate('/messenger/register')
         }
     }
 
