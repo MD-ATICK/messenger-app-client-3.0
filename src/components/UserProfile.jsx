@@ -28,7 +28,6 @@ function UserProfile({ userProfileShow, setuserProfileShow, socket }) {
         setblockLoading(false)
         openedChat.chatBlockedBy = data.condition === true ? user._id : "none"
         setopenedChat(data.chat)
-        console.log({ openedChat, data: data.chat })
         socket.emit('blockStatus', { chat: data.chat, user })
         if (data.condition === true) {
           chats.find((c) => c._id === openedChat._id).chatBlockedBy = user._id

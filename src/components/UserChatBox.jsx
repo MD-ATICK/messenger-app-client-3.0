@@ -170,7 +170,6 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
           if (openedChat) {
             return setopenedChat(chat)
           }
-          console.log('out of room run ...')
           let f = chats.find((c) => c._id === chat._id)
           f.chatBlockedBy = chat.chatBlockedBy
           f.lastBlockAt = chat.lastBlockAt
@@ -342,11 +341,11 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                           }
                           <div className={`flex ${content.images.length > 0 && 'p-[1px] sm:p-1 md:p-2 mb-1 sm:mb-2'} bg-[#15f5d032] relative flex-col max-w-[200px] sm:max-w-[310px] lg:max-w-[800px] items-end rounded-xl`}>
                             <div className={` ${content.images.length > 0 ? 'block' : 'hidden'} sm:h-[14px] sm:w-[14px] w-[10px] h-[10px] rounded-[4px] bg-[#15f5d032] cliplow transform rotate-45 absolute -bottom-[5.5px] sm:-bottom-[6.8px] right-4`}></div>
-                            <div className='flex flex-wrap items-end justify-end'>
+                            <div className='flex flex-wrap items-end justify-center'>
                               {
                                 content.images.length > 0 && content.images.map((i, index) => {
                                   return <Link to={i.image} key={index} target='_blank' >
-                                    <img src={i.image} className='h-[90px]  sm:h-[150px] w-[95px] sm:w-[150px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
+                                    <img src={i.image} className='sm:h-[150px] w-full sm:w-[140px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
                                   </Link>
                                 })
                               }
@@ -364,11 +363,11 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                           <div className='flex items-start flex-col justify-start'>
                             <div className={` ${content.images.length > 0 && 'p-[1px] sm:p-1 md:p-2 mb-[14px]'} relative bg-[#15f5d032] max-w-[200px] sm:max-w-[310px] lg:max-w-[800px] rounded-xl flex flex-col items-start `}>
                               <div className={` ${content.images.length > 0 ? 'block' : 'hidden'} sm:h-[14px] sm:w-[14px] w-[10px] h-[10px] rounded-[4px] bg-[#15f5d032] cliplow transform rotate-45 absolute -bottom-[5.5px] sm:-bottom-[6.8px] left-5`}></div>
-                              <div className='flex flex-wrap items-end justify-end'>
+                              <div className='flex flex-wrap justify-center items-end'>
                                 {
                                   content.images.length > 0 && content.images.map((i, index) => {
                                     return <Link to={i.image} key={index} target='_blank' >
-                                      <img src={i.image} className='h-[90px] sm:h-[150px] w-[95px] sm:w-[149px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
+                                      <img src={i.image} className='sm:h-[150px] w-full sm:w-[140px] lg:w-[240px] mb-1 p-1 lg:h-[240px] object-cover rounded-xl' alt="" />
                                     </Link>
                                   })
                                 }

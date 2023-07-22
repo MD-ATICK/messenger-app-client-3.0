@@ -70,13 +70,14 @@ function Login() {
     }, []);
 
     return (
-        <div className="w-full bg-[#00393a] p-2 sm:p-4 relative h-screen clippath grid place-items-center">
+        <div className="w-full bg-[#00393a] p-2 sm:p-4 relative h-screen clippath flex flex-col justify-center items-center">
             <div className='max-w-5xl bg-[#003031] p-0 flex justify-between shadow-lg rounded-2xl w-full border-white mx-auto'>
-                <div className='flex-[0.6] p-6 justify-center items-center hidden md:flex rounded-2xl'>
+                <div className=' md:flex-[0.6] md:p-6 justify-center items-center hidden md:flex rounded-2xl'>
                     <img src="/hero_img.png" alt="" />
                 </div>
-                <div className=' flex-[1] md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-3 py-6 px-4 sm:p-10'>
-                    <h1 className=' text-3xl sm:text-4xl font-bold text-white'>Login</h1>
+                <div className='w-full md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-3 py-6 px-4 sm:p-10'>
+                    <h1 className=' text-[26px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[30px] sm:text-[34px] text-gradient'>Dark Chat</h1>
+                        Login</h1>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Email</label>
                         <input value={email} onChange={(e) => setemail(e.target.value)} type="text" placeholder='Enter Email' className='border-[2px] text-[13px] sm:text-[16px] outline-none text-white py-2 px-4 font-sans tracking-wider font-[500] border-[#00797b] rounded-sm bg-[#003031]' />

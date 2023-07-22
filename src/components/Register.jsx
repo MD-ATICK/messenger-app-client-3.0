@@ -97,12 +97,12 @@ function Register() {
 
 
     return (
-        <div className="w-full bg-[#00393a] p-2 sm:p-6 relative h-screen clippath grid place-items-center">
+        <div className="w-full overflow-x-scroll bg-[#00393a] p-2 sm:p-6 relative h-screen clippath grid place-items-center">
             <div className='max-w-5xl bg-[#003031] flex justify-between shadow-lg rounded-2xl w-full border-white mx-auto'>
-                <div className='flex-[.7] p-6 justify-center items-center hidden md:flex rounded-2xl'>
+                <div className='md:flex-[.7] p-6 justify-center items-center hidden md:flex rounded-2xl'>
                     <img src="/hero_img.png" alt="" />
                 </div>
-                <div className=' flex-[1] md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-4 sm:p-10'>
+                <div className=' w-full md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-4 sm:p-10'>
                     <h1 className='text-3xl sm:text-4xl font-bold text-white'>Register</h1>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Username</label>
