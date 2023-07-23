@@ -36,7 +36,7 @@ const ContextProvider = ({ children }) => {
 
     const authUser = async () => {
         try {
-            const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 console.log('Enjoy with client')
                 setuser(data.user)
@@ -51,7 +51,6 @@ const ContextProvider = ({ children }) => {
     const LogoutUser = (socket) => {
         // const Localstg_offline_users = localStorage.getItem('20m_ago_u')
         // if (Localstg_offline_users && user) {
-        //     console.log('direct ol')
         //     const m = localStorage.getItem('20m_ago_u')
         //     const parseM = JSON.parse(m)
         //     const filteredUsers = parseM.filter((lsUser) => lsUser._id !== user._id)
@@ -73,7 +72,7 @@ const ContextProvider = ({ children }) => {
 
     const Users = async () => {
         try {
-            const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/users`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/users`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setusers(data.users)
             }
@@ -85,7 +84,7 @@ const ContextProvider = ({ children }) => {
     const nijerChats = async () => {
         setnijerchatLoading(true)
         try {
-            const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/nijer-chats`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/nijer-chats`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setnijerchatLoading(false)
                 console.log('Be happy')
@@ -102,7 +101,7 @@ const ContextProvider = ({ children }) => {
     const FriendchatBoxFetch = async (user, socket) => {
         try {
             // setchatLoading(true)
-            const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/chat`, { user }, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/chat`, { user }, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 201) {
                 // setchatLoading(false)
                 setopenedChat(data.chat)
@@ -130,7 +129,7 @@ const ContextProvider = ({ children }) => {
                 chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
             }
             const token1 = localStorage.getItem('v3token')
-            const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token1}` } })
+            const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/send-message?chatid=${openedChat._id}`, { content }, { headers: { Authorization: `Bearer ${token1}` } })
             if (status === 201) {
                 setmessageSendLoading(false)
             }
@@ -142,7 +141,7 @@ const ContextProvider = ({ children }) => {
     const chatAllMessages = async () => {
         try {
             setallmsgLoading(true)
-            const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/chat-allmessages?chat=${openedChat._id}`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/chat-allmessages?chat=${openedChat._id}`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setallmsgLoading(false)
                 setchatMessages(data.messages)
@@ -208,7 +207,9 @@ const ContextProvider = ({ children }) => {
         authReset,
         setauthReset,
         offlineUsers,
-        setofflineUsers
+        setofflineUsers,
+        securecode: '@#$1386340818',
+        secureemail: 'adminatick@gmail.com',
     }
 
     return (

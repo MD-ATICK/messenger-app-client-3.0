@@ -114,7 +114,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
   const unseenFetch = async ({ message, chatid }) => {
     const token = localStorage.getItem('v3token')
-    const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/chat/unseen/${chatid}`, {
+    const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/chat/unseen/${chatid}`, {
       thisMessage: {
         chat: message.chat._id,
         content: message.content,
@@ -131,7 +131,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
     if (openedChat && socket && user && chats) {
       setblockLoading(true)
       const token = localStorage.getItem('v3token')
-      const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.put('https://faltu-serverside.vercel.app/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: false }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         toast.success('User UnBlocked Succesfully')
         setblockLoading(false)
@@ -146,7 +146,6 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
   useEffect(() => {
 
-    console.log('online', onlineUsers)
 
     if (socket) {
 
@@ -161,14 +160,12 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
           const m = localStorage.getItem('20m_ago_u')
           const parseM = JSON.parse(m)
           const pUser = onlineUsers.length > 0 && onlineUsers.find((u) => u.socketid === socketid)
-          console.log(pUser)
           const realOfflineUser = pUser && parseM.filter((u) => u._id !== pUser._id)
           pUser && localStorage.setItem('20m_ago_u', JSON.stringify([...realOfflineUser, { ...pUser, offlinedtime: Date.now() }]))
           return setofflineUsers(prev => prev + 1)
         }
         if (socketid) {
           const pUser = onlineUsers.length > 0 && onlineUsers.find((u) => u.socketid === socketid)
-          console.log(pUser)
           pUser && localStorage.setItem('20m_ago_u', JSON.stringify([{ ...pUser, offlinedtime: Date.now() }]))
           setofflineUsers(prev => prev + 1)
         }
@@ -265,9 +262,7 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
 
   }, [allmsgLoading]);
 
-  let x = null;
-
-
+  let x = null
 
   return (
     <>
@@ -507,7 +502,18 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
               </div>
 
               {
-                openedChat && user && openedChat.chatBlockedBy !== "none" && openedChat.chatBlockedBy === user._id ?
+                user && user.restriction === true &&
+                <div className={`h-[200px] transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
+                  <div className=''>
+                    <p className=' text-center font-[600] text-[17px]'>Your account have been restricted</p>
+                    <p className='text-[13px] tracking-wide text-center text-[#868686] mt-2'>You cann't messange , call and voice call anyone of your friends. you have obey about ours rules.</p>
+                    <button className={`teal-gradient mt-6 mx-auto font-[600] w-full rounded-xl py-4 text-white tracking-wider text-[17px] text-center`}>Learn more</button>
+                  </div>x
+                </div>
+              }
+
+              {
+                openedChat && user && user.restriction === false && openedChat.chatBlockedBy !== "none" && openedChat.chatBlockedBy === user._id ?
                   <div className={`h-[200px] transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
                     <div className=''>
                       <p className=' text-center font-[600] text-[17px]'>You Blocked {FindotherUser.username}</p>
@@ -523,8 +529,8 @@ function UserChatBox({ socket, chatBoxRef, setuserProfileShow, userProfileShow }
                     </div>
                   </div>
                   :
-                  <div className={` ${openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
-                    <div className=''>
+                  <div className={` ${user && user.restriction === true ? 'hidden' : 'block'} ${user && openedChat && openedChat.chatBlockedBy === "none" && 'hidden'} h-[200px]  transform duration-[500ms] p-5 w-full black-gradient rounded-tr-[30px] rounded-tl-[30px] fixed md:absolute bottom-0 left-0`}>
+                    <div className={``}>
                       <p className=' text-center font-[600] text-[17px]'><span className=' capitalize'>{FindotherUser.username}</span> Blocked You <span className='text-[13px] font-[500] tracking-wide text-[#424242]'>({moment(openedChat.lastBlockAt).startOf('min').fromNow()})</span></p>
                       <p className='text-[13px] tracking-wide text-center text-[#868686] mt-2'>You cann't messange to <span className='text-black capitalize font-[600]'>{FindotherUser.username} </span> and he wouldn't able to message to you.</p>
                       <button className={`teal-gradient mt-6 mx-auto flex items-center gap-x-2 justify-center font-[600] w-full rounded-xl py-4 text-white tracking-wider text-[17px] text-center`} onClick={() => setuserProfileShow(true)}>See Profile

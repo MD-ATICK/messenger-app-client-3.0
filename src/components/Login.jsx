@@ -27,7 +27,7 @@ function Login() {
 
                 const { data: locationData } = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
                 if (locationData) {
-                    const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
+                    const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                     if (status === 201) {
                         localStorage.setItem('notice', 'new')
                         setuser(data.user)
@@ -54,7 +54,7 @@ function Login() {
 
     const authUser = async (token) => {
         const x = window.navigator.userAgent
-        const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 200 && data.user.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
         } else if (status === 223) {
@@ -76,15 +76,15 @@ function Login() {
                     <img src="/hero_img.png" alt="" />
                 </div>
                 <div className='w-full md:flex-[0.4] flex flex-col gap-y-5 rounded-2xl p-3 py-6 px-4 sm:p-10'>
-                    <h1 className=' text-[20px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[25px] sm:text-[35px] text-gradient'>Dark Chat</h1>
-                        Login</h1>
+                    <div className=' text-[20px] sm:text-3xl font-bold text-white flex items-center gap-x-3'>  <h1 className='font-bold text-[25px] sm:text-[35px] text-gradient'>Dark Chat</h1>
+                        Login</div>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Email</label>
-                        <input value={email} onChange={(e) => setemail(e.target.value)} type="text" placeholder='Enter Email' className='border-[2px] text-[13px] sm:text-[16px] outline-none text-white py-2 px-4 font-sans tracking-wider font-[500] border-[#00797b] rounded-sm bg-[#003031]' />
+                        <input value={email} onChange={(e) => setemail(e.target.value)} type="text" placeholder='Enter Email' className='border-[2px] text-[13px] sm:text-[16px] outline-none text-[#dcdcdc] py-2 px-4 font-sans tracking-wide font-[600] border-[#00797b] rounded-sm bg-[#003031]' />
                     </div>
                     <div className='flex flex-col'>
                         <label htmlFor="one" className=' font-sans tracking-wider font-[600] text-white mb-1 text-[15px]'>* Passowrd</label>
-                        <input value={password} onChange={(e) => setpassword(e.target.value)} type="text" placeholder='Enter Password' className='border-[2px] outline-none text-[13px] sm:text-[16px] text-white py-2 px-4 font-sans tracking-wider font-[500] border-[#00797b] rounded-sm bg-[#003031]' />
+                        <input value={password} onChange={(e) => setpassword(e.target.value)} type="text" placeholder='Enter Password' className='border-[2px] outline-none text-[13px] sm:text-[16px] text-[#dcdcdc] py-2 px-4 font-sans tracking-wide font-[600] border-[#00797b] rounded-sm bg-[#003031]' />
                     </div>
 
                     <button onClick={LoginHanlder} className='w-full py-[12px] hover:bg-[#2d9b8af1] duration-150 px-6 rounded-lg mt-2 text-white font-sans tracking-wide font-[600] pt-[14px] bg-[#10baa0f1]'> {loginLoading ? <PulseLoader color='white' size={12} /> : 'Login'}</button>

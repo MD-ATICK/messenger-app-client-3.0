@@ -22,7 +22,7 @@ function UserProfile({ userProfileShow, setuserProfileShow, socket }) {
     if (openedChat && socket && user && chats) {
       setblockLoading(true)
       const token = localStorage.getItem('v3token')
-      const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: blockCondition }, { headers: { Authorization: `Bearer ${token}` } })
+      const { data, status } = await axios.put('https://faltu-serverside.vercel.app/chat/blockOrUnblock', { chatid: openedChat._id, blockCondition: blockCondition }, { headers: { Authorization: `Bearer ${token}` } })
       if (status === 201) {
         data.condition === true ? toast.success('User Blocked Succesfully') : toast.success('User UnBlocked Succesfully')
         setblockLoading(false)
