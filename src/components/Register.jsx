@@ -36,7 +36,7 @@ function Register() {
                 if (locationData) {
                     const { data: { data: { url } }, status: ibbStatus } = await axios.post(`https://api.imgbb.com/1/upload?key=6226ca30d95b139a79184223cfbc266a`, form)
                     if (ibbStatus === 200) {
-                        const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/api/messenger/register`, { username, email, password, avatar: url, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
+                        const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/register`, { username, email, password, avatar: url, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                         if (status === 201) {
                             setuser(data.createUser)
                             localStorage.setItem('notice', 'new')
@@ -80,7 +80,7 @@ function Register() {
     }
 
     const authUser = async (token) => {
-        const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 200 && data.createUser.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
         } else if (status === 223) {

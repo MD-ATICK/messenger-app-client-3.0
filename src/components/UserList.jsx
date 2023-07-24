@@ -60,7 +60,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
             chater.unseenMessages = []
             setopenedChat(chater)
             socket.emit('unempty', { chat: chat, userid: user._id })
-            const { data, status } = await axios.put('https://faltu-serverside.vercel.app/chat/unseenRemove', { chatid: chat._id }, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/unseenRemove', { chatid: chat._id }, { headers: { Authorization: `Bearer ${token}` } })
         } else {
             setopenedChat(chat)
         }
@@ -80,7 +80,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                 chater.unseenMessages = []
                 setopenedChat(chater)
                 socket.emit('unempty', { chat: chater, userid: user._id })
-                const { data, status } = await axios.put('https://faltu-serverside.vercel.app/chat/unseenRemove', { chatid: chater._id }, { headers: { Authorization: `Bearer ${token}` } })
+                const { data, status } = await axios.put('https://faltu-serverside-md-atick.vercel.app/chat/unseenRemove', { chatid: chater._id }, { headers: { Authorization: `Bearer ${token}` } })
             } else {
                 setopenedChat(chater)
             }
@@ -109,6 +109,8 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
             return setdetailsShow(true)
         }
     }, []);
+
+    console.log("user", secureemail, user)
 
 
 
@@ -214,9 +216,10 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                             <div className='text-cener flex justify-center'> <PulseLoader size={14} color='teal' /></div>
                             :
                             (!chatLoading && search !== '' && usersnew && usersnew.length > 0 && usersnew.map((user, index) => {
-                                const { _id, username, avatar } = user
+                                const { _id, username, avatar, email } = user
                                 return <div key={index} onClick={() => FriendchatBoxFetch(user, socket)} title={_id} className='flex items-center gap-x-3 hover:bg-teal-800 cursor-pointer p-2 px-4 rounded-full'>
                                     <div className='fetchCZuser relative w-9 h-9 title'>
+                                        {email === secureemail && <img className='h-5 w-5 rounded-full absolute -top-2 left-6 z-[999]' src="./crown.png" alt="" />}
                                         <img src={avatar ? avatar : "./img-1.webp"} className='w-full shadow-sm shadow-white h-full rounded-full object-cover' alt="" />
                                         {onlineUsers.find((i) => i._id === user._id) && <p className='h-[9px] w-[9px] bg-green-500 rounded-full absolute -top-[0px] -right-[2px]'></p>}
                                     </div>
@@ -229,7 +232,8 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                     {/* <==> Chat Box Users <==> */}
                     {
                         search === '' && user && chats && chats.length > 0 && chats.map((chat, index) => {
-                            const f = chat.users.find((x) => x._id.toString() !== user._id.toString())
+                            const f = user && chat.users.find((x) => x._id.toString() !== user._id.toString())
+
                             const { avatar, username, _id } = f
                             let userUnseened = false;
                             if (chat.unseenMessages.length > 0 && user) {
@@ -242,9 +246,7 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                                         {user && chat.unseenMessages.length === 0 ? <img src={chat.users.find((c) => c._id.toString() !== user._id.toString()).avatar} className='h-[18px] w-[18px] rounded-full object-cover' alt="" /> : !messageSendLoading ? <MdOutlineDoneAll className='text-[16px] text-[#00b822]' /> : <MdOutlineDoneAll className='text-[16px] text-[#6d6d6d]' />}
                                     </div>
                                 }
-                                {/* {
-                                    !userUnseened &&
-                                } */}
+                                {f.email === secureemail && <img className='h-5 w-5 rounded-full absolute top-1 left-10 z-[999]' src="./crown.png" alt="" />}
                                 <div className=' relative w-12 h-10 title'>
                                     <img src={avatar ? avatar : "./img-1.webp"} className='w-full shadow-sm shadow-white h-full rounded-full object-cover' alt="" />
                                     {onlineUsers.find((i) => i._id === _id) && <p className='h-[9px] w-[9px] bg-green-500 rounded-full absolute -top-[0px] -right-[2px]'></p>}
@@ -261,15 +263,12 @@ function UserList({ onlineUsers, setonlineUsers, socket }) {
                                     </div>
                                     <div className={`text-[#cdcdcd] text-right flex items-center justify-between capitalize gap-x-1  tracking-wide`}>
                                         <span className={` lowercase   ${chat.latestMessage ? ' text-[12px] sm:text-[13px] ' : ' text-white text-[11px] sm:text-[12px] '}   ${userUnseened ? 'text-white' : 'text-[#b5b5b5]'} `} > {user && chat.latestMessage ? `${chat.latestMessage.sender._id === user._id ? 'you' : 'he'} : ${chat.latestMessage.content.text.length < 15 ? chat.latestMessage.content.text : chat.latestMessage.content.text.slice(0, 13) + '...'}` : `${user && user._id === chat.users[0]._id ? 'you contact to him.' : chat.users[0].username + ' want to contact you.'}`}</span>
-                                        {/* <div>
-                                        {chat.unseenMessages.length !== 0 ? chat.unseenMessages.length : 0}
-                                    </div> */}
                                     </div>
-                                    {/* <p className='capitalize tracking-wide font-[500] ml-1 text-[#989898] text-[14px] '>{chat.latestMessage ? `${chat.latestMessage.sender.username}: ${chat.latestMessage.content.text} ` : `${chat.users[0].name} contact with you`}</p> */}
                                 </div>
                             </div>
                         })
                     }
+                    {/* <==> end <==> */}
                     <h1 className={`${search.length === 0 && chats && chats.length === 0 ? 'block' : 'hidden'}  m-3 bg-teal-700 text-center mt-4  py-2 px-4 rounded-lg font-sans tracking-wider `}>
                         Search Your Friends
                     </h1>

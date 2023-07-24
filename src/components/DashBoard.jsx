@@ -26,7 +26,7 @@ function DashBoard({ setuserListActivetap }) {
     const usersFetch = async () => {
         try {
             setusersDetailsLoading(true)
-            const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/usersDetails?securecode=${securecode}`, { headers: { Authorization: `Bearer ${token}` } })
+            const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/usersDetails?securecode=${securecode}`, { headers: { Authorization: `Bearer ${token}` } })
             if (status === 200) {
                 setusersDetailsLoading(false)
                 setusersAll(data.usersAll)
@@ -42,7 +42,7 @@ function DashBoard({ setuserListActivetap }) {
             setblockloading(true)
             if (email === secureemail) return toast.error('admin ke restriced deoya jabe na.')
             if (token) {
-                const { data, status } = await axios.put(`https://faltu-serverside.vercel.app/api/messenger/restriction`, { email }, { headers: { Authorization: `Bearer ${token}` } })
+                const { data, status } = await axios.put(`https://faltu-serverside-md-atick.vercel.app/api/messenger/restriction`, { email }, { headers: { Authorization: `Bearer ${token}` } })
                 if (status === 201) {
                     setblockloading(false)
                     toast.success(data.toast)

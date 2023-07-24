@@ -27,7 +27,7 @@ function Login() {
 
                 const { data: locationData } = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`)
                 if (locationData) {
-                    const { data, status } = await axios.post(`https://faltu-serverside.vercel.app/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
+                    const { data, status } = await axios.post(`https://faltu-serverside-md-atick.vercel.app/api/messenger/login`, { email, password, currectDevice, location: locationData ? `${locationData.locality} , ${locationData.principalSubdivision} , ${locationData.countryName}` : 'unknown address' })
                     if (status === 201) {
                         localStorage.setItem('notice', 'new')
                         setuser(data.user)
@@ -54,7 +54,7 @@ function Login() {
 
     const authUser = async (token) => {
         const x = window.navigator.userAgent
-        const { data, status } = await axios.get(`https://faltu-serverside.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
+        const { data, status } = await axios.get(`https://faltu-serverside-md-atick.vercel.app/api/messenger/me`, { headers: { Authorization: `Bearer ${token}` } })
         if (status === 200 && data.user.accessDevices.find((ac) => ac.accessDevice === x)) {
             navigate('/')
         } else if (status === 223) {
